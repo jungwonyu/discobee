@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <link rel="stylesheet" type="text/css" href="./css/style.css" />
+  <title>디스커비</title>
+  <script src="https://cdn.jsdelivr.net/npm/phaser@3.90.0/dist/phaser.min.js"></script>
+</head>
+
+<body>
+  <div id="gameContainer"></div>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/webfont/1.6.28/webfontloader.js"></script>
+  <!-- <script src="./dist/bundle.js"></script> -->
+  <script type="module">
+    WebFont.load({
+      custom: {
+        families: ['Cafe24Surround'],
+        urls: ['css/style.css']
+      },
+      active: function() {
+        import('./dist/bundle.js').catch(() => import('./js/main.js')); // 빌드된 파일이 있으면 사용, 없으면 원본 사용
+      }
+    });
+  </script>
+</body>
+</html>

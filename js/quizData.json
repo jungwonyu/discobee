@@ -1,0 +1,74 @@
+[
+    {
+    "answer": "banana",
+    "quizImage": "img/play/world/banana.png",
+    "fullImage": "img/play/world/banana_full.png",
+    "number": 3,
+    "options": ["bread", "banana", "potato"]
+  },
+  {
+    "answer": "diamond",
+    "quizImage": "img/play/world/diamond.png",
+    "fullImage": "img/play/world/diamond_full.png",
+    "number": 3,
+    "options": ["ice", "diamond", "mountain"]
+  },
+  {
+    "answer": "duck",
+    "quizImage": "img/play/world/duck.png",
+    "fullImage": "img/play/world/duck_full.png",
+    "number": 3,
+    "options": ["duck", "snake", "rabbit"]
+  },
+  {
+    "answer": "fan",
+    "quizImage": "img/play/world/fan.png",
+    "fullImage": "img/play/world/fan_full.png",
+    "number": 3,
+    "options": ["fan", "net", "basket"]
+  },
+
+  {
+    "answer": "sandwich",
+    "quizImage": "img/play/world/sandwich.png",
+    "fullImage": "img/play/world/sandwich_full.png",
+    "number": 3,
+    "options": ["cake", "cutlet", "sandwich"]
+  },
+  {
+    "answer": "scissors",
+    "quizImage": "img/play/world/scissors.png",
+    "fullImage": "img/play/world/scissors_full.png",
+    "number": 3,
+    "options": ["clock", "scissors", "skate shoes"]
+  },
+  {
+    "answer": "umbrella",
+    "quizImage": "img/play/world/umbrella.png",
+    "fullImage": "img/play/world/umbrella_full.png",
+    "number": 3,
+    "options": ["glass", "spider", "umbrella"]
+  },
+
+  {
+    "answer": "pencil",
+    "quizImage": "img/play/world/pencil.png",
+    "fullImage": "img/play/world/pencil_full.png",
+    "number": 3,
+    "options": ["wood", "cookie", "pencil"]
+  },
+  {
+    "answer": "ant",
+    "quizImage": "img/play/world/ant.png",
+    "fullImage": "img/play/world/ant_full.png",
+    "number": 3,
+    "options": ["scorpion", "ant", "butterfly"]
+  },
+  {
+    "answer": "book",
+    "quizImage": "img/play/world/book.png",
+    "fullImage": "img/play/world/book_full.png",
+    "number": 3,
+    "options": ["sun", "gold", "book"]
+  }
+]
