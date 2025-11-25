@@ -1,14 +1,13 @@
-import playConfig from '../playSetting.js';
 import quizData from '../quizData.js';
 import Stage from '../Stage.js';
 import MiniMap from '../MiniMap.js';
 import EnemyManager from '../manager/EnemyManager.js';
 import ItemManager from '../manager/ItemManager.js';
+import { WORLD_SIZE, CANVAS_SIZE, HEXAGON_SIZE, PLAY_SPEED, TURN_EASE, LINE_INTERVAL, TRAIL_WIDTH, TRAIL_COLOR, EARLY_ENEMY_COUNT, EARLY_ENEMY_SPEED, EARLY_ENEMY_RANGE, EARLY_ENEMY_RADIUS } from '../config';
 
 export default class PlayScene extends Phaser.Scene {
   constructor() {
     super('PlayScene');
-    this.playConfig = playConfig;
     this.quizData = quizData;
   }
 
@@ -123,18 +122,18 @@ export default class PlayScene extends Phaser.Scene {
     this.isGameOver = false;
     
     // MAP
-    this.world = { w: this.playConfig.WORLD_W, h: this.playConfig.WORLD_H }; // 전체 크기
-    this.canvasSize = { w: this.playConfig.CANVAS_W, h: this.playConfig.CANVAS_H }; // 캔버스 크기
-    this.hexagonSize = { w: this.playConfig.HEXAGON_W, h: this.playConfig.HEXAGON_H }; // 육각형 크기
+    this.world = {w: WORLD_SIZE.width, h: WORLD_SIZE.height}; // 전체 크기
+    this.canvasSize = {w: CANVAS_SIZE.width, h: CANVAS_SIZE.height}; // 캔버스 크기
+    this.hexagonSize = {w: HEXAGON_SIZE.width, h: HEXAGON_SIZE.height}; // 육각형 크기
     this.hexagonList = []; // 모든 육각형 타일 배열
     
     // PLAYER
-    this.playerSpeed = this.playConfig.PLAY_SPEED; // 플레이어 스피드
-    this.turnEase = this.playConfig.TURN_EASE; // 플레이어 방향 부드럽게 (작을수록 브드러움)
+    this.playerSpeed = PLAY_SPEED; // 플레이어 스피드
+    this.turnEase = TURN_EASE; // 플레이어 방향 부드럽게 (작을수록 브드러움)
     this.isDrawing = false; // 그리기는 중인지 확인
-    this.interval = this.playConfig.LINE_INTERVAL; // 선 그리기 간격
-    this.trailWidth = this.playConfig.TRAIL_WIDTH; // 꼬리 넓이
-    this.trailColor = this.playConfig.TRAIL_COLOR; // 꼬리 색
+    this.interval = LINE_INTERVAL; // 선 그리기 간격
+    this.trailWidth = TRAIL_WIDTH; // 꼬리 넓이
+    this.trailColor = TRAIL_COLOR; // 꼬리 색
     
     this.isInvincible = false;
     this.invincibilityTimer = null;
@@ -143,10 +142,10 @@ export default class PlayScene extends Phaser.Scene {
     
     // ENEMY
     this.enemies = null; // 적 그룹
-    this.enemyCount = this.playConfig.EARLY_ENEMY_COUNT; // 초기 적 수
-    this.enemySpeed = this.playConfig.EARLY_ENEMY_SPEED; // 적 아동 속도
-    this.enemyRange = this.playConfig.EARLY_ENEMY_RANGE; // 좌우/상하 왕복 총폭(대략)
-    this.enemyRadius = this.playConfig.EARLY_ENEMY_RADIUS; // 적 이동 반지름 (원형)
+    this.enemyCount = EARLY_ENEMY_COUNT; // 초기 적 수
+    this.enemySpeed = EARLY_ENEMY_SPEED; // 적 아동 속도
+    this.enemyRange = EARLY_ENEMY_RANGE; // 좌우/상하 왕복 총폭(대략)
+    this.enemyRadius = EARLY_ENEMY_RADIUS; // 적 이동 반지름 (원형)
     
     this.enemyFrozen = false;
     this.frozenEnemies = new Set();

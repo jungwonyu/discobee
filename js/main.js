@@ -6,9 +6,6 @@ import PlayScene from './scenes/Play.js';
 import GameOverScene from './scenes/GameOver.js';
 import QuizScene from './scenes/Quiz.js';
 import MedalScene from './scenes/Medal.js';
-import playConfig from './playSetting.js';
-
-playConfig.TRAIL_COLOR = parseInt(playConfig.TRAIL_COLOR, 16);
 
 const config = {
   type: Phaser.WEBGL,

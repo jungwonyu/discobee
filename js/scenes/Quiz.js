@@ -1,5 +1,4 @@
 import { FONT_FAMILY } from '../config';
-import { getMedalNumber } from '../utils';
 
 // 버튼 스타일 상수
 const BUTTON = { WIDTH: 300, HEIGHT: 80, PADDING_X: 20, PADDING_Y: 20, COLOR_PURPLE: 0x8c4c9e, COLOR_YELLOW: 0xfddc3e };
@@ -74,9 +73,9 @@ export default class QuizScene extends Phaser.Scene {
   // 육각형 마스크 Graphics 생성 함수
   createHexMaskGraphics(frameX, frameY, frameSize) {
     const graphics = this.make.graphics({ x: 0, y: 0, add: false });
-    const cx = frameX + frameSize / 2 - 2;
-    const cy = frameY + frameSize / 2 - 2;
-    const r = frameSize / 2 - 2;
+    const cx = frameX + frameSize / 2 + 6;
+    const cy = frameY + frameSize / 2;
+    const r = frameSize / 2;
     graphics.beginPath();
     for (let i = 0; i < 6; i++) {
       const angle = Phaser.Math.DegToRad(60 * i - 30);

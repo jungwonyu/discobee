@@ -84,7 +84,6 @@ export default class Stage {
     });
 
     const mask = new Phaser.Display.Masks.GeometryMask(this.scene, maskGraphics);
-    // this.quizBg.setMask(mask);
     this.bgDim.setMask(mask);
   }
 
@@ -102,7 +101,7 @@ export default class Stage {
     const mapPixelWidth = (cols - 1) * this.tileWidth + HEXAGON_SIZE.width;
     const mapPixelHeight = (rows - 1) * HEXAGON_SIZE.height + HEXAGON_SIZE.height;
     const offsetX = (WORLD_SIZE.width / 2) - (mapPixelWidth / 2);
-    const offsetY = (WORLD_SIZE.height / 2) - (mapPixelHeight / 2);
+    const offsetY = (WORLD_SIZE.height / 2) - (mapPixelHeight / 2) - 25;
 
     for (let col = -1; col < cols; col++) {
       for (let row = -1; row < rows; row++) {

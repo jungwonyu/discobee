@@ -1,4 +1,3 @@
-
 import { getMedalNumber, addHoverEffectFrame } from './utils.js';
 
 /**
