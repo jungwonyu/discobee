@@ -110,16 +110,16 @@ export default class MiniMap {
 		document.querySelector('canvas').style.opacity = '0';
 
 		// 2. 요소 숨기기
-		const toHide = [scene.player, scene.enemies, this.minimapCam, this.quizButton, scene.items, scene.trailGraphics];
+		const itemGroup = scene.itemManager?.items || scene.items;
+		const effects = scene.activeEffects || [];
+		const toHide = [scene.player, scene.enemies, this.minimapCam, this.quizButton, itemGroup, scene.trailGraphics, ...effects];
 		const toHideHex = scene.stage.hexagonList.filter(tile => tile.visible !== false && tile.texture && tile.texture.key !== 'limit');
 		const toHideBgDim = [scene.stage.bgDim];
-
 		[...toHide, ...toHideHex, ...toHideBgDim].forEach(obj => obj && obj.setVisible(false));
 
 		// 3. quizBg의 mask 잠시 해제
 		let quizBg = scene.stage && scene.stage.quizBg;
 		let originalMask = null;
-
 		if (quizBg && quizBg.mask) {
 			originalMask = quizBg.mask;
 			quizBg.setMask(null);
@@ -130,26 +130,26 @@ export default class MiniMap {
 		const zoomX = scene.canvasSize.w / scene.world.w;
 		const zoomY = scene.canvasSize.h / scene.world.h;
 		const newZoom = Math.min(zoomX, zoomY);
-
 		mainCam.stopFollow().setZoom(newZoom).setScroll(0, 0);
 
-		// 5. 스냅샷 찍기
+		// 5. 첫 번째 스냅샷 찍기
 		scene.game.renderer.snapshot(snapshotNoHexagon => {
 			if (quizBg && originalMask) quizBg.setMask(originalMask);
+			// 다음 프레임에 두 번째 스냅샷 찍기
+			setTimeout(() => {
+				scene.game.renderer.snapshot(snapshotImage => {
+					[...toHide, ...toHideHex, ...toHideBgDim].forEach(obj => obj && obj.setVisible(true));
+					mainCam.setZoom(originalZoom).startFollow(scene.player);
 
-			// hexagon 포함 전체 스냅샷
-			scene.game.renderer.snapshot(snapshotImage => {
-				[...toHide, ...toHideHex, ...toHideBgDim].forEach(obj => obj && obj.setVisible(true));
-				mainCam.setZoom(originalZoom).startFollow(scene.player);
+					if (scene.textures.exists('worldSnapshot')) scene.textures.remove('worldSnapshot');
+					if (scene.textures.exists('worldSnapshotNoHexagon')) scene.textures.remove('worldSnapshotNoHexagon');
+					scene.textures.addImage('worldSnapshot', snapshotImage);
+					scene.textures.addImage('worldSnapshotNoHexagon', snapshotNoHexagon);
 
-				if (scene.textures.exists('worldSnapshot')) scene.textures.remove('worldSnapshot');
-				if (scene.textures.exists('worldSnapshotNoHexagon')) scene.textures.remove('worldSnapshotNoHexagon');
-				scene.textures.addImage('worldSnapshot', snapshotImage);
-				scene.textures.addImage('worldSnapshotNoHexagon', snapshotNoHexagon);
-
-				// QuizScene으로 전환
-				scene.scene.launch('QuizScene', { quiz: scene.quiz, allQuizzes: scene.allQuizzes, canvasSize: scene.canvasSize, percent: this.hexagonPercent() });
-			});
+					// QuizScene으로 전환
+					scene.scene.launch('QuizScene', { quiz: scene.quiz, allQuizzes: scene.allQuizzes, canvasSize: scene.canvasSize, medalNumber: getMedalNumber(this.hexagonPercent()) });
+				});
+			}, 0);
 		});
 	}
 

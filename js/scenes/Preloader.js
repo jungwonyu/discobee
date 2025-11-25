@@ -135,15 +135,36 @@ export default class Preloader extends Phaser.Scene {
     this.load.spritesheet("return_btn", "assets/img/over/return_btn.png", { frameWidth: 361.5,frameHeight: 134 });
 
     // quizScene
-    this.load.image("bee_incorrect", "assets/img/quiz/bee_incorrect.png"); // 꿀벌
-    this.load.image("bee_correct", "assets/img/quiz/bee_correct.png");
-    this.load.spritesheet('bee_fail', 'assets/img/quiz/bee_fail.png', { frameWidth: 170, frameHeight: 223 });
-    this.load.spritesheet('bee_win', 'assets/img/quiz/bee_win.png', { frameWidth: 520, frameHeight: 591 });
+    this.load.spritesheet('bee_incorrect', 'assets/img/quiz/bee_incorrect.png', { frameWidth: 170, frameHeight: 223 });
 
+    // 메달
     this.load.image("medal_1", "assets/img/quiz/medal_1.png"); // 다이아 메달
+    this.load.spritesheet('medal_1_1', 'assets/img/quiz/medal_1_1.png', { frameWidth: 505.5, frameHeight: 591 });
+    this.load.spritesheet('medal_1_2', 'assets/img/quiz/medal_1_2.png', { frameWidth: 505.5, frameHeight: 591 });
+    this.load.spritesheet('medal_1_3', 'assets/img/quiz/medal_1_3.png', { frameWidth: 505.5, frameHeight: 591 });
+    this.load.spritesheet('medal_1_4', 'assets/img/quiz/medal_1_4.png', { frameWidth: 505.5, frameHeight: 591 });
+    this.load.spritesheet('medal_1_5', 'assets/img/quiz/medal_1_5.png', { frameWidth: 505.5, frameHeight: 591 });
+
     this.load.image("medal_2", "assets/img/quiz/medal_2.png"); // 금 메달
+    this.load.spritesheet('medal_2_1', 'assets/img/quiz/medal_2_1.png', { frameWidth: 505.5, frameHeight: 591 });
+    this.load.spritesheet('medal_2_2', 'assets/img/quiz/medal_2_2.png', { frameWidth: 505.5, frameHeight: 591 });
+    this.load.spritesheet('medal_2_3', 'assets/img/quiz/medal_2_3.png', { frameWidth: 505.5, frameHeight: 591 });
+    this.load.spritesheet('medal_2_4', 'assets/img/quiz/medal_2_4.png', { frameWidth: 505.5, frameHeight: 591 });
+    this.load.spritesheet('medal_2_5', 'assets/img/quiz/medal_2_5.png', { frameWidth: 505.5, frameHeight: 591 });
+
     this.load.image("medal_3", "assets/img/quiz/medal_3.png"); // 은 메달
+    this.load.spritesheet('medal_3_1', 'assets/img/quiz/medal_3_1.png', { frameWidth: 505.5, frameHeight: 591 });
+    this.load.spritesheet('medal_3_2', 'assets/img/quiz/medal_3_2.png', { frameWidth: 505.5, frameHeight: 591 });
+    this.load.spritesheet('medal_3_3', 'assets/img/quiz/medal_3_3.png', { frameWidth: 505.5, frameHeight: 591 });
+    this.load.spritesheet('medal_3_4', 'assets/img/quiz/medal_3_4.png', { frameWidth: 505.5, frameHeight: 591 });
+    this.load.spritesheet('medal_3_5', 'assets/img/quiz/medal_3_5.png', { frameWidth: 505.5, frameHeight: 591 });
+
     this.load.image("medal_4", "assets/img/quiz/medal_4.png"); // 동 메달
+    this.load.spritesheet('medal_4_1', 'assets/img/quiz/medal_4_1.png', { frameWidth: 505.5, frameHeight: 591 });
+    this.load.spritesheet('medal_4_2', 'assets/img/quiz/medal_4_2.png', { frameWidth: 505.5, frameHeight: 591 });
+    this.load.spritesheet('medal_4_3', 'assets/img/quiz/medal_4_3.png', { frameWidth: 505.5, frameHeight: 591 });
+    this.load.spritesheet('medal_4_4', 'assets/img/quiz/medal_4_4.png', { frameWidth: 505.5, frameHeight: 591 });
+    this.load.spritesheet('medal_4_5', 'assets/img/quiz/medal_4_5.png', { frameWidth: 505.5, frameHeight: 591 });
 
     this.load.image("main_btn", "assets/img/quiz/mainPage_btn.png"); // 처음으로
     this.load.image("main_btn_h", "assets/img/quiz/mainPage_btn_h.png"); // 처음으로 호버

@@ -34,10 +34,10 @@ export default class QuizScene extends Phaser.Scene {
     this.quiz = data.quiz;
     this.allQuizzes = data.allQuizzes;
     this.canvasSize = data.canvasSize;
-    this.percent = data.percent;
+    this.medalNumber = data.medalNumber;
   }
 
-  // 정답 이미지 및 bee_fail 스프라이트시트 프리로드
+  // 리소스 프리로드
   preload() {
     this.load.image(this.quiz.answer + '_full', this.quiz.fullImage);
   }
@@ -45,39 +45,30 @@ export default class QuizScene extends Phaser.Scene {
   // 씬 생성
   create() {
     const canvas = document.querySelector('canvas');
-    canvas.style.transition = 'opacity 0.5s';
+    canvas.style.transition = 'opacity 0.2s';
     setTimeout(() => {
       canvas.style.opacity = '1';
       canvas.style.transition = '';
-    }, 100);
-
-    this.cameras.main.setBackgroundColor('#4a2e1d');
+      this.cameras.main.setBackgroundColor('#4a2e1d');
+    }, 20);
 
     if (!this.anims.exists('bee_incorrect_ani')) {
       this.anims.create({
         key: 'bee_incorrect_ani',
-        frames: this.anims.generateFrameNumbers('bee_fail', { start: 0, end: 89 }), // 프레임 수에 맞게 수정
+        frames: this.anims.generateFrameNumbers('bee_incorrect', { start: 0, end: 89 }), // 프레임 수에 맞게 수정
         frameRate: 10,
         repeat: -1
       });
     }
 
-    if (!this.anims.exists('bee_correct_ani')) {
-      this.anims.create({
-        key: 'bee_correct_ani',
-        frames: this.anims.generateFrameNumbers('bee_win', { start: 0, end: 22 }), // 프레임 수에 맞게 수정
-        frameRate: 10,
-        repeat: -1
-      });
-    }
+    // 메달 애니메이션 생성
+    for (let i = 1; i <= 4; i++) this.createMedalAnimation(i);
 
     this.add.text(this.scale.width / 2,  80,  '그림이 나타내는 영어 단어는 무엇일까요?',  { fontSize: '50px', color: '#ffffff', fontFamily: FONT_FAMILY }).setOrigin(0.45);
-    this.medalNumber = getMedalNumber(this.percent);
     this.add.image(100, 80, `medal_${this.medalNumber}`).setScale(1);
     if (this.textures.exists('worldSnapshot')) this.snapshotImage = this.renderMaskedImage('worldSnapshot');
     this.renderAnswerButtons();
-    // 나가기 버튼 생성
-    this.exitButton = this.renderFeedbackButton('exit_btn', () => this.returnToPlayScene());
+    this.exitButton = this.renderFeedbackButton('exit_btn', () => this.returnToPlayScene()); // 나가기 버튼 생성
   }
 
   // 육각형 마스크 Graphics 생성 함수
@@ -136,16 +127,10 @@ export default class QuizScene extends Phaser.Scene {
       const buttonY = startY + idx * (BUTTON.HEIGHT + BUTTON.PADDING_Y);
 
       const button = this.createAnswerButton(buttonX, buttonY, optionText, () => {
-        // 모든 객관식 버튼 비활성화
-        this.itemButtonGroup.children.iterate(child => child.disableInteractive && child.disableInteractive());
-        // 나가기 버튼 제거
-        if (this.exitButton && this.exitButton.active) this.exitButton.destroy();
+        this.itemButtonGroup.children.iterate(child => child.disableInteractive && child.disableInteractive()); // 모든 객관식 버튼 비활성화
+        if (this.exitButton && this.exitButton.active) this.exitButton.destroy(); // 나가기 버튼 제거
         // 정오답 처리
-        if (optionText === correctAnswer) {
-          this.correct();
-        } else {
-          this.incorrect();
-        }
+        (optionText === correctAnswer) ? this.correct() : this.incorrect();
       });
       this.itemButtonGroup.add(button);
     });
@@ -196,11 +181,11 @@ export default class QuizScene extends Phaser.Scene {
     let totalWidth = 0;
     let textMaxHeight = 0;
     const padding = 10;
-    const beeFailGap = 30; // bee_fail 옆에 줄 여백(px)
+    const beeFailGap = 20;
 
     const sizes = contentInfo.map((info) => {
-      if (info.type === 'image' && info.key === 'bee_fail') {
-        const width = 128 * info.scale + beeFailGap; // bee_fail 이미지 너비 + 여백
+      if (info.type === 'image' && info.key === 'bee_incorrect') {
+        const width = 128 * info.scale + beeFailGap; // bee_incorrect 이미지 너비 + 여백
         const height = 128 * info.scale;
         totalWidth += width;
         return { width, height };
@@ -218,10 +203,9 @@ export default class QuizScene extends Phaser.Scene {
     const textBaselineY = boxCenterY + textMaxHeight / 2;
 
     contentInfo.forEach((info, index) => {
-      if (info.type === 'image' && info.key === 'bee_fail') {
-        const bee = this.add.sprite(currentX + 64 * info.scale, boxCenterY + 20, 'bee_fail').setScale(info.scale).setOrigin(0.5, 0.5);
+      if (info.type === 'image' && info.key === 'bee_incorrect') {
+        const bee = this.add.sprite(currentX + 64 * info.scale, boxCenterY + 20, 'bee_incorrect').setScale(info.scale).setOrigin(0.5, 0.5);
         bee.play('bee_incorrect_ani');
-        currentX += beeFailGap; // bee_fail 다음에 여백 추가
       } else {
         this.add.text(currentX, textBaselineY, info.text, info.style).setOrigin(0, 1);
       }
@@ -238,29 +222,32 @@ export default class QuizScene extends Phaser.Scene {
 
   // 정답 처리
   correct() {
-    this.setCursor('default');
-    this.sound.play('correct');
-    this.increaseMedalCount(this.medalNumber);
-    this.showFullAnswerImage(this.snapshotImage);
-    this.renderFeedbackBox();
-    this.renderFeedbackButton('next_btn', () => this.goToNextQuiz());
+    this.handleAnswerResult(true);
   }
 
   // 오답 처리
   incorrect() {
+    this.handleAnswerResult(false);
+  }
+
+  // 정답/오답 처리 통합 함수
+  handleAnswerResult(isCorrect) {
     this.setCursor('default');
-    this.sound.play('incorrect');
-    this.renderFeedbackBox(false);
-    this.renderFeedbackButton('main_btn', () => this.goToNextQuiz());
+    this.sound.play(isCorrect ? 'correct' : 'incorrect');
+    if (isCorrect) {
+      this.increaseMedalCount(this.medalNumber);
+      this.showFullAnswerImage(this.snapshotImage);
+    }
+    this.renderFeedbackBox(isCorrect);
+    const btnName = isCorrect ? 'next_btn' : 'main_btn';
+    this.renderFeedbackButton(btnName, () => this.goToNextQuiz());
   }
 
   // 정답 이미지 애니메이션 표시
   showFullAnswerImage(snapshotImage) {
-    // 정답일 때 hexagon 없는 worldSnapshotNoHexagon 이미지를 마스킹하여 보여줌
     const { x, y, displayWidth, displayHeight, mask } = snapshotImage;
     snapshotImage.destroy();
-    let imageKey = 'worldSnapshotNoHexagon'; // worldSnapshotNoHexagon 텍스처가 있으면 사용
-    const fullImage = this.add.image(x, y, imageKey).setAlpha(0).setOrigin(0, 0);
+    const fullImage = this.add.image(x, y, 'worldSnapshotNoHexagon').setAlpha(0).setOrigin(0, 0);
     const scaleX = displayWidth / fullImage.width;
     const scaleY = displayHeight / fullImage.height;
     const scale = Math.min(scaleX, scaleY);
@@ -279,9 +266,9 @@ export default class QuizScene extends Phaser.Scene {
     const remainingQuizzes = this.allQuizzes.filter((q) => q.answer !== this.quiz.answer);
 
     if (remainingQuizzes.length === 0) {
-      this.scene.start('PlayScene', { quiz: this.quiz, allQuizzes: remainingQuizzes, showMedalOnStart: true, percent: this.percent });
+      this.scene.start('PlayScene', { quiz: this.quiz, allQuizzes: remainingQuizzes, showMedalOnStart: true, medalNumber: this.medalNumber });
     } else { 
-      this.scene.start('PlayScene', { allQuizzes: remainingQuizzes, showMedalOnStart: true, percent: this.percent });
+      this.scene.start('PlayScene', { allQuizzes: remainingQuizzes, showMedalOnStart: true, medalNumber: this.medalNumber });
     }
   }
 
@@ -296,7 +283,7 @@ export default class QuizScene extends Phaser.Scene {
     const x = this.canvasSize.w - 50;
     const y = this.canvasSize.h - 50;
 
-    const button = this.add.image(x, y, name).setOrigin(1, 1).setInteractive({ useHandCursor: true });
+    const button = this.add.image(x, y, name).setOrigin(1, 1).setInteractive({ useHandCursor: true }).setDepth(2);
     button.on('pointerdown', () => callback());
     button.on('pointerover', () => button.setTexture(`${name}_h`));
     button.on('pointerout', () => button.setTexture(`${name}`));
@@ -314,7 +301,7 @@ export default class QuizScene extends Phaser.Scene {
       ];
     } else {
       return [
-        { type: 'image', key: 'bee_fail', scale: 0.6 },
+        { type: 'image', key: 'bee_incorrect', scale: 0.6 },
         { type: 'text', text: '오답', style: FEEDBACK_STYLE.BLUE },
         { type: 'text', text: '입니다!', style: FEEDBACK_STYLE.BROWN },
       ];
@@ -326,16 +313,25 @@ export default class QuizScene extends Phaser.Scene {
     const contentInfo = this.buildFeedbackContent(isCorrect);
     const feedbackBoxHeight = 100;
     const feedbackBoxY = 80 - feedbackBoxHeight / 2;
+    const medalAniName = `medal_${this.medalNumber}_ani`;
+
     this.add.graphics().fillStyle(0xf5eeda, 1).fillRect(0, feedbackBoxY, this.canvasSize.w, feedbackBoxHeight);
 
-    // isCorrect면 화면 정가운데에 bee_correct 애니메이션 추가
     if (isCorrect) {
-      console.log(this.canvasSize);
-      const bee = this.add.sprite(this.canvasSize.w / 2, this.canvasSize.h / 2, 'bee_win').setOrigin(0.5, 0.5);
-      bee.play('bee_correct_ani');
+      const bee = this.add.sprite(this.canvasSize.w / 2, this.canvasSize.h / 2, `medal_${this.medalNumber}_1`).setOrigin(0.5, 0.5).setDepth(2);
+      this.add.graphics().fillStyle(0x000000, 0.5).fillRect(0, 0, this.canvasSize.w, this.canvasSize.h).setDepth(1);
+      bee.play(medalAniName);
     }
-
     this.renderFeedbackContent(contentInfo);
+  }
+
+  // 메달 애니메이션 생성 함수
+  createMedalAnimation(medalNum) {
+    const key = `medal_${medalNum}_ani`;
+    if (this.anims.exists(key)) return;
+    const frames = [];
+    for (let i = 1; i <= 5; i++) frames.push(...this.anims.generateFrameNumbers(`medal_${medalNum}_${i}`, { start: 0, end: 17 }));
+    this.anims.create({ key, frames, frameRate: 10, repeat: -1 });
   }
 
   // 메달 개수 증가

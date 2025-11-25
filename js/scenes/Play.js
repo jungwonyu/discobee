@@ -2,6 +2,8 @@ import playConfig from '../playSetting.js';
 import quizData from '../quizData.js';
 import Stage from '../Stage.js';
 import MiniMap from '../MiniMap.js';
+import EnemyManager from '../manager/EnemyManager.js';
+import ItemManager from '../manager/ItemManager.js';
 
 export default class PlayScene extends Phaser.Scene {
   constructor() {
@@ -40,17 +42,23 @@ export default class PlayScene extends Phaser.Scene {
     this.dir = new Phaser.Math.Vector2(1, 0);
     this.player.setVelocity(this.dir.x * this.playerSpeed, this.dir.y * this.playerSpeed);
     this.enemies = this.physics.add.group({ collideWorldBounds: true });
-    for (let i = 0; i < this.enemyCount; i++) { this.spawnEnemySimple(); }
-    this.spawnTimer = this.time.addEvent({ delay: 3000, callback: this.spawnEnemySimple, callbackScope: this, loop: true });
-    this.items = this.physics.add.group();
-    this.itemTimer = this.time.addEvent({ delay: 7000, callback: this.spawnItem, callbackScope: this, loop: true });
+    this.enemyManager = new EnemyManager(this);
+    // 타이머/이펙트 일괄 관리용 배열
+    this.activeTimers = [];
+    this.activeEffects = [];
+    
+    for (let i = 0; i < this.enemyCount; i++) { this.enemyManager.spawnEnemySimple(); }
+    this.spawnTimer = this.time.addEvent({ delay: 3000, callback: () => this.enemyManager.spawnEnemySimple(), callbackScope: this, loop: true });
+    this.activeTimers.push(this.spawnTimer);
+    this.itemManager = new ItemManager(this);
+    this.itemManager.start();
 
     // UI 생성/업데이트는 MiniMap에 위임
     this.miniMap = new MiniMap(this);
 
     // 충돌 설정
     this.physics.add.overlap(this.player, this.enemies, () => !this.isInvincible && this.gameOver('hit_enemy'));
-    this.physics.add.overlap(this.player, this.items, this.eatItem, null, this);
+    this.physics.add.overlap(this.player, this.itemManager.items, (player, item) => this.itemManager.eatItem(player, item), null, this);
 
     // 메달씬
     if (this.showMedalOnStart) {
@@ -63,14 +71,13 @@ export default class PlayScene extends Phaser.Scene {
     this.playerMoving();
     this.updateTrailPath();
 
-    if (this.speedEffect && this.speedEffect.visible) {
-      this.speedEffect.x = this.player.x;
-      this.speedEffect.y = this.player.y;
-    }
-    if (this.shieldEffect && this.shieldEffect.visible) {
-      this.shieldEffect.x = this.player.x;
-      this.shieldEffect.y = this.player.y;
-    }
+    // 이펙트 일괄 위치 갱신
+    this.activeEffects.forEach(effect => {
+      if (effect && effect.visible) {
+        effect.x = this.player.x;
+        effect.y = this.player.y;
+      }
+    });
     if (!this.isInvincible && this.checkSelfTrailCollision(this.player)) {
       this.gameOver('hit_trail');
       return;
@@ -116,9 +123,9 @@ export default class PlayScene extends Phaser.Scene {
     this.isGameOver = false;
     
     // MAP
-    this.world = {w: this.playConfig.WORLD_W, h: this.playConfig.WORLD_H}; // 전체 크기
-    this.canvasSize = {w: this.playConfig.CANVAS_W, h: this.playConfig.CANVAS_H}; // 캔버스 크기
-    this.hexagonSize = {w: this.playConfig.HEXAGON_W, h: this.playConfig.HEXAGON_H}; // 육각형 크기
+    this.world = { w: this.playConfig.WORLD_W, h: this.playConfig.WORLD_H }; // 전체 크기
+    this.canvasSize = { w: this.playConfig.CANVAS_W, h: this.playConfig.CANVAS_H }; // 캔버스 크기
+    this.hexagonSize = { w: this.playConfig.HEXAGON_W, h: this.playConfig.HEXAGON_H }; // 육각형 크기
     this.hexagonList = []; // 모든 육각형 타일 배열
     
     // PLAYER
@@ -148,9 +155,22 @@ export default class PlayScene extends Phaser.Scene {
     // item 
     this.items = null;
 
-    // effect 초기화
+    // effect 초기화 및 배열 관리
     this.speedEffect = null;
     this.shieldEffect = null;
+    this.activeEffects = [];
+  }
+
+  // 씬 종료 시 타이머/이펙트 일괄 정리
+  shutdown() {
+    if (this.activeTimers) {
+      this.activeTimers.forEach(timer => timer && timer.remove());
+      this.activeTimers = [];
+    }
+    if (this.activeEffects) {
+      this.activeEffects.forEach(effect => effect && effect.destroy());
+      this.activeEffects = [];
+    }
   }
 // ------ 맵 관련 -------------------------------------------------------------------------------------------------
   // 중앙에 구멍 메우기
@@ -617,222 +637,6 @@ export default class PlayScene extends Phaser.Scene {
 // ------ 게임 오버; ----------------------------------------------------------------------------------------------
 
 // ------ 몬스터 --------------------------------------------------------------------------------------------------
-  // 몬스터 랜덤 패턴
-  pickPattern() { return Phaser.Math.RND.pick(['LR', 'APPROACH', 'UD', 'APPROACH', 'CIRCLE', 'RECT', 'APPROACH']) };
-
-  // 몬스터 생성
-  spawnEnemySimple(type = this.pickPattern()) {
-    if (!this.enemies) return;
-
-    const minX = this.canvasSize.w / 2;
-    const minY = this.canvasSize.h / 2;
-    const maxX = this.world.w;
-    const maxY = this.world.h;
-    
-    const MAX_TRIES = 50; // 유효 위치를 찾기 위한 최대 시도 횟수
-    const MIN_DISTANCE_FROM_PLAYER = 200; // 플레이어로부터 최소 스폰 거리
-
-    let x, y, tries = 0;
-    let isValidSpawn = false;
-
-    // limit에 인접한 타일도 제외하는 안전 체크
-    const isSafeHex = (hx, hy) => {
-      const hex = this.getNearestHexagon(hx, hy);
-      if (!hex || hex.texture.key === 'limit' || this.isOnMyHexagon(hx, hy)) return false;
-      // limit에 인접한 타일도 제외
-      const neighbors = this.hexagonList.filter(h => Phaser.Math.Distance.Between(h.x, h.y, hex.x, hex.y) < 60 && h !== hex);
-      return !neighbors.some(nb => nb.texture?.key === 'limit');
-    };
-
-    // 유효한 스폰 위치를 찾을 때까지 반복
-    while (!isValidSpawn && tries < MAX_TRIES) {
-      x = Phaser.Math.Between(minX, maxX);
-      y = Phaser.Math.Between(minY, maxY);
-
-      const distanceFromPlayer = Phaser.Math.Distance.Between(x, y, this.player.x, this.player.y);
-
-      if (isSafeHex(x, y) && distanceFromPlayer > MIN_DISTANCE_FROM_PLAYER) { isValidSpawn = true; }
-      tries++;
-    }
-
-    // 유효한 위치를 찾았을 경우에만 적을 생성
-    if (isValidSpawn) {
-      const enemy = this.enemies.create(x, y, 'enemy');
-      enemy.setSize(this.enemyRadius * 2, this.enemyRadius * 2);
-      enemy.setScale(0.7);
-      enemy.setDepth(1);
-      this.startPattern(enemy, type);
-      return enemy;
-    }
-
-    return null;
-  }
-
-  // 몬스터 패턴 생성
-  startPattern(enemy, type) {
-    if (!enemy || !enemy.active || enemy.pendingRemoval) return;
-    const minX = this.canvasSize.w / 2,  minY = this.canvasSize.h / 2;
-    const maxX = this.world.w,      maxY = this.world.h;
-    switch (type) {
-      case 'LR':     return this.startLR(enemy, minX, maxX);
-      case 'UD':     return this.startUD(enemy, minY, maxY);
-      case 'CIRCLE': return this.startCircle(enemy, minX, maxX, minY, maxY);
-      case 'APPROACH': return this.startApproach(enemy, minX, maxX, minY, maxY);
-      default: return this.startRect(enemy, minX, maxX, minY, maxY);
-    }
-  };
-
-  // 기존 패턴 끝나면 랜덤 패턴 부여
-  nextPattern(enemy) {
-    if (!enemy || !enemy.active || enemy.pendingRemoval) return;
-    this.startPattern(enemy, this.pickPattern());
-  }
-
-  // 패턴 이동
-  go(enemy, to, onDone) {
-    if (!enemy || !enemy.active || enemy.pendingRemoval) return;
-    const dist = Phaser.Math.Distance.Between(enemy.x, enemy.y, to.x, to.y);
-    const duration = Math.max(50, (dist / (this.enemySpeed || 90)) * 1000);
-
-    this.tweens.killTweensOf(enemy); // 겹치는 트윈 방지(한 번에 하나만)
-    this.tweens.add({
-      targets: enemy,
-      x: to.x, y: to.y,
-      duration,
-      ease: 'Linear',
-      onComplete: onDone
-    });
-  };
-  
-  // this.go 를 연결 (한점 한점 연결)
-  chain(enemy, points, onComplete) {
-    let i = 0;
-    const step = () => {
-      if (!enemy || !enemy.active || enemy.pendingRemoval) return;
-      if (i >= points.length) { onComplete && onComplete(); return; }
-      const to = points[i++];
-      this.go(enemy, to, step);
-    };
-    step();
-  }
-
-  // 좌우 패턴
-  startLR(enemy, minX, maxX) {
-    const half = Math.floor((this.enemyRange || 200) / 2);
-    const left = Phaser.Math.Clamp(enemy.x - half, minX, maxX);
-    const right = Phaser.Math.Clamp(enemy.x + half, minX, maxX);
-
-    // 안전한 좌표만 이동하도록 보정
-    const safe = (x, y) => {
-      const hex = this.getNearestHexagon(x, y);
-      return hex && hex.texture.key !== 'limit';
-    };
-    const points = [];
-    if (safe(left, enemy.y)) points.push({x:left, y:enemy.y});
-    if (safe(right, enemy.y)) points.push({x:right, y:enemy.y});
-    if (points.length < 2) return this.nextPattern(enemy);
-
-    // 현재 위치에서 더 가까운 끝 → 반대 끝 순서
-    const nearFirst = Math.abs(enemy.x - left) <= Math.abs(enemy.x - right);
-    const ordered = nearFirst ? points : points.slice().reverse();
-    this.chain(enemy, ordered, () => this.nextPattern(enemy));
-  }
-
-  // 위아래 패턴
-  startUD(enemy, minY, maxY) {
-    const half = Math.floor((this.enemyRange || 200) / 2);
-    const top = Phaser.Math.Clamp(enemy.y - half, minY, maxY);
-    const bottom = Phaser.Math.Clamp(enemy.y + half, minY, maxY);
-
-    // 안전한 좌표만 이동하도록 보정
-    const safe = (x, y) => {
-      const hex = this.getNearestHexagon(x, y);
-      return hex && hex.texture.key !== 'limit';
-    };
-    const points = [];
-    if (safe(enemy.x, top)) points.push({x:enemy.x, y:top});
-    if (safe(enemy.x, bottom)) points.push({x:enemy.x, y:bottom});
-    if (points.length < 2) return this.nextPattern(enemy);
-
-    const nearFirst = Math.abs(enemy.y - top) <= Math.abs(enemy.y - bottom);
-    const ordered = nearFirst ? points : points.slice().reverse();
-    this.chain(enemy, ordered, () => this.nextPattern(enemy));
-  }
-
-  // 원형 패턴
-  startCircle(enemy, minX, maxX, minY, maxY) {
-    const rawR = Phaser.Math.Between(80, 140);
-    const maxSafeR = Math.min(enemy.x - minX, maxX - enemy.x, enemy.y - minY, maxY - enemy.y);
-    const r = Math.max(20, Math.min(rawR, maxSafeR));
-
-    const cx = enemy.x, cy = enemy.y;
-    const SEG = 12;
-    const points = [];
-    const safe = (x, y) => {
-      const hex = this.getNearestHexagon(x, y);
-      return hex && hex.texture.key !== 'limit';
-    };
-    for (let k = 1; k <= SEG; k++) {
-      const th = (2 * Math.PI * k) / SEG;
-      const px = cx + r * Math.cos(th);
-      const py = cy + r * Math.sin(th);
-      if (safe(px, py)) points.push({ x: px, y: py });
-    }
-    if (points.length < 3) return this.nextPattern(enemy);
-    this.chain(enemy, points, () => this.nextPattern(enemy));
-  }
-
-  // 사각형 패턴
-  startRect(enemy, minX, maxX, minY, maxY) {
-    const halfW = Math.floor(Phaser.Math.Between(160,260) / 2);
-    const halfH = Math.floor(Phaser.Math.Between(120,220) / 2);
-
-    const left = Phaser.Math.Clamp(enemy.x - halfW, minX, maxX);
-    const right = Phaser.Math.Clamp(enemy.x + halfW, minX, maxX);
-    const top = Phaser.Math.Clamp(enemy.y - halfH, minY, maxY);
-    const bottom = Phaser.Math.Clamp(enemy.y + halfH, minY, maxY);
-
-    const safe = (x, y) => {
-      const hex = this.getNearestHexagon(x, y);
-      return hex && hex.texture.key !== 'limit';
-    };
-    const points = [];
-    if (safe(left, top)) points.push({x:left, y:top});
-    if (safe(right, top)) points.push({x:right, y:top});
-    if (safe(right, bottom)) points.push({x:right, y:bottom});
-    if (safe(left, bottom)) points.push({x:left, y:bottom});
-    if (points.length < 3) return this.nextPattern(enemy);
-    this.chain(enemy, points, () => this.nextPattern(enemy));
-  }
-
-  // 플레이어 있는 쪽으로 이동 패턴
-  startApproach(enemy, minX, maxX, minY, maxY) {
-    if (!enemy || !enemy.active || enemy.pendingRemoval) return;
-    if (!this.player) return this.nextPattern(enemy);
-
-    const dx = this.player.x - enemy.x;
-    const dy = this.player.y - enemy.y;
-    const dist = Math.hypot(dx, dy);
-
-    // 너무 가까우면 다음 패턴
-    if (dist < 1) return this.nextPattern(enemy);
-
-    // 한 스텝 길이: enemyRange(=EARLY_ENEMY_RANGE) 혹은 남은 거리 중 더 작은 쪽
-    const step = Math.min(this.enemyRange || 100, dist);
-    const ux = dx / dist, uy = dy / dist;
-
-    // 목표 지점
-    let tx = enemy.x + ux * step;
-    let ty = enemy.y + uy * step;
-
-    // 이동 가능 영역으로 클램프
-    tx = Phaser.Math.Clamp(tx, minX, maxX);
-    ty = Phaser.Math.Clamp(ty, minY, maxY);
-
-    // 등속 1구간 이동 후 다음 랜덤 패턴
-    this.go(enemy, { x: tx, y: ty }, () => this.nextPattern(enemy));
-  }
-
   cullEnemiesOnMyHex() {
     if (!this.enemies) return;
     // 안전하게 복사된 배열(or 역순 루프)로 순회하며 제거
@@ -896,6 +700,7 @@ export default class PlayScene extends Phaser.Scene {
     };
     return false;
   };
+
   // 타일을 my_hexagon으로 바꾸기
   markAsMyHexagon(hex) {
     if (!hex) return;
@@ -909,147 +714,4 @@ export default class PlayScene extends Phaser.Scene {
     }
   }
 // ------ 몬스터; -------------------------------------------------------------------------------------------------
-
-// ------ ITEM ----------------------------------------------------------------------------------------------------
-  // 아이템 생성
-  spawnItem() {
-    if (!this.items) return;
-    const itemTypes = ['freeze', 'speed', 'invincible'];
-    const itemType = Phaser.Math.RND.pick(itemTypes);
-
-    const existingItems = this.items.getChildren ? this.items.getChildren() : [];
-    const spawnHexes = this.hexagonList.filter(hex => {
-      if (hex.texture?.key === 'limit' || this.isOnMyHexagon(hex.x, hex.y)) return false;
-      return !existingItems.some(item => {
-        const dx = (item.x ?? 0) - hex.x;
-        const dy = (item.y ?? 0) - (hex.y - 10);
-        return Math.sqrt(dx * dx + dy * dy) < 30;
-      });
-    });
-
-    if (spawnHexes.length === 0) return;
-    const spawnHex = Phaser.Math.RND.pick(spawnHexes);
-    const item = this.items.create(spawnHex.x, spawnHex.y - 10, `item_${itemType}`);
-    item.setScale(0.53);
-    item.itemType = itemType;
-    this.time.delayedCall(30000, () => {
-      if (item.active) item.destroy();
-    }, [], this);
-  }
-
-  // 아이템 먹었을 때
-  eatItem(player, item) {
-    this.applyItemEffect(item);
-    item.destroy();
-  }
-
-  // 아이템 먹을 시 효과
-  applyItemEffect(item) {
-    switch(item.itemType) {
-      case 'freeze':
-        this.freezeEnemies(10000); // 5초
-        break;
-      case 'speed':
-        this.boostPlayerSpeed(10000, 100); // 5초, +100
-        break;
-      case 'invincible':
-        this.makePlayerInvincible(10000); // 5초
-        break;
-    }
-  }
-
-  // 얼음
-  freezeEnemies(duration) {
-    if (this.enemyFrozen) {
-      this.time.delayedCall(duration, this.unfreezeEnemies, [], this);
-      return;
-    }
-
-    this.enemyFrozen = true;
-    if (this.spawnTimer) this.spawnTimer.paused = true; // 적 생성 일시 정지
-
-    const enemies = this.enemies.getChildren();
-    for (const enemy of enemies) {
-      this.tweens.killTweensOf(enemy);
-      enemy.setVelocity(0);
-      enemy.setTexture('enemy_freeze');
-      this.frozenEnemies.add(enemy);
-    }
-    
-    this.time.delayedCall(duration, this.unfreezeEnemies, [], this);
-  }
-
-  // 얼음 되돌리기
-  unfreezeEnemies() {
-    this.enemyFrozen = false;
-    for (const enemy of this.frozenEnemies) {
-      if (enemy && enemy.active) {
-        enemy.setTexture('enemy');
-        this.startPattern(enemy, this.pickPattern());
-      }
-    }
-    this.frozenEnemies.clear();
-    this.time.delayedCall(0, () => this.cullEnemiesOnMyHex()); // my_hexagon 위 적 정리
-    if (this.spawnTimer) this.spawnTimer.paused = false;
-  }
-
-  // 스피드 업
-  boostPlayerSpeed(duration, boostAmount) {
-    if (this.speedBoostTimer) {
-      const remainingTime = this.speedBoostTimer.getRemaining();
-      this.speedBoostTimer.remove();
-      duration += remainingTime;
-    }
-
-    if (this.speedBoostTimer) this.speedBoostTimer.remove();
-    this.playerSpeed = this.originalPlayerSpeed + boostAmount;
-
-    if (!this.anims.exists('speed_effect')) {
-      this.anims.create({
-        key: 'speed_effect',
-        frames: this.anims.generateFrameNumbers('buster_effect', { start: 0, end: 41 }),
-        frameRate: 15,
-        repeat: -1
-      });
-    }
-    if (!this.speedEffect) {
-      this.speedEffect = this.add.sprite(this.player.x, this.player.y, 'buster_effect');
-      this.speedEffect.setDepth(this.player.depth - 1);
-    }
-    this.speedEffect.setVisible(true);
-    this.speedEffect.play('speed_effect', true);
-
-    this.speedBoostTimer = this.time.delayedCall(duration, () => {
-      this.playerSpeed = this.originalPlayerSpeed;
-      this.player.setTexture('player');
-      if (this.speedEffect) this.speedEffect.setVisible(false);
-    }, [], this);
-  }
-
-  // 무적 invincible
-  makePlayerInvincible(duration) {
-    if (this.shieldEffectTimer) this.shieldEffectTimer.remove();
-    this.isInvincible = true;
-    if (!this.anims.exists('shield_effect')) {
-      this.anims.create({
-        key: 'shield_effect',
-        frames: this.anims.generateFrameNumbers('shield_effect', { start: 0, end: 33 }),
-        frameRate: 20,
-        repeat: -1
-      });
-    }
-    if (!this.shieldEffect) {
-      this.shieldEffect = this.add.sprite(this.player.x, this.player.y, 'shield_effect');
-      this.shieldEffect.setDepth(2);
-    }
-    this.shieldEffect.setVisible(true);
-    this.shieldEffect.play('shield_effect', true);
-
-    this.shieldEffectTimer = this.time.delayedCall(duration, () => {
-      this.isInvincible = false;
-      this.player.setTexture('player');
-      if (this.shieldEffect) this.shieldEffect.setVisible(false);
-    }, [], this);
-  }
-// ------ ITEM; ---------------------------------------------------------------------------------------------------
 };
