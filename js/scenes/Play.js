@@ -27,7 +27,7 @@ export default class PlayScene extends Phaser.Scene {
 
   create() {
     // 배경색 설정
-    this.cameras.main.setBackgroundColor('#FBE68D');
+    this.cameras.main.setBackgroundColor('#E0C180');
 
     // 맵 및 게임 요소 생성
     this.initStage();

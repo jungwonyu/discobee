@@ -111,10 +111,11 @@ export default class MiniMap {
 		// 2. 요소 숨기기
 		const itemGroup = scene.itemManager?.items || scene.items;
 		const effects = scene.activeEffects || [];
+		
 		const toHide = [scene.player, scene.enemies, this.minimapCam, this.quizButton, itemGroup, scene.trailGraphics, ...effects];
-		const toHideHex = scene.stage.hexagonList.filter(tile => tile.visible !== false);
+		const toHideHexAll = scene.stage.hexagonList.filter(tile => tile.visible !== false);
 		const toHideBgDim = [scene.stage.bgDim];
-		[...toHide, ...toHideHex, ...toHideBgDim].forEach(obj => obj && obj.setVisible(false));
+		[...toHide, ...toHideHexAll, ...toHideBgDim].forEach(obj => obj && obj.setVisible(false));
 
 		// 3. quizBg의 mask 잠시 해제
 		let quizBg = scene.stage && scene.stage.quizBg;
@@ -134,10 +135,15 @@ export default class MiniMap {
 		// 5. 첫 번째 스냅샷 찍기
 		scene.game.renderer.snapshot(snapshotNoHexagon => {
 			if (quizBg && originalMask) quizBg.setMask(originalMask);
-			// 다음 프레임에 두 번째 스냅샷 찍기
+			const hexagonTiles = scene.stage.hexagonList.filter(tile => tile.texture.key === 'hexagon');
+			hexagonTiles.forEach(tile => tile.setVisible(true));
+			const toHideHexExceptHexagon = scene.stage.hexagonList.filter(tile => tile.visible !== false && tile.texture.key !== 'hexagon');
+			[...toHide, ...toHideHexExceptHexagon, ...toHideBgDim].forEach(obj => obj && obj.setVisible(false));
+
+			// 6. 다음 프레임에 두 번째 스냅샷 찍기
 			setTimeout(() => {
 				scene.game.renderer.snapshot(snapshotImage => {
-					[...toHide, ...toHideHex, ...toHideBgDim].forEach(obj => obj && obj.setVisible(true));
+					[...toHide, ...toHideHexAll, ...toHideBgDim].forEach(obj => obj && obj.setVisible(true));
 					mainCam.setZoom(originalZoom).startFollow(scene.player);
 
 					if (scene.textures.exists('worldSnapshot')) scene.textures.remove('worldSnapshot');

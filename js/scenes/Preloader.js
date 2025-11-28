@@ -85,7 +85,10 @@ export default class Preloader extends Phaser.Scene {
     this.load.image("help_prev_btn_h", "assets/img/help/help_prev_btn_h.png");
     this.load.image("close_btn", "assets/img/help/close_btn.png");
     this.load.image("close_btn_h", "assets/img/help/close_btn_h.png");
-    this.load.image("help_bg", "assets/img/help/help_bg.png");
+    this.load.image("help_1", "assets/img/help/help_1.png");
+    this.load.image("help_2", "assets/img/help/help_2.png");
+    this.load.image("help_3", "assets/img/help/help_3.png");
+    this.load.image("help_4", "assets/img/help/help_4.png");
     this.load.image("help_text_1", "assets/img/help/help_text_1.png");
     this.load.image("help_text_2", "assets/img/help/help_text_2.png");
     this.load.image("help_text_3", "assets/img/help/help_text_3.png");

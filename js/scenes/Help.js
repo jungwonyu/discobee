@@ -41,12 +41,13 @@ export default class HelpScene extends Phaser.Scene {
   }
 
   createPages() {
-    this.add.image(this.centerX, this.centerY - 50, 'help_bg').setScale(STYLE_SCALE);
+    // this.add.image(this.centerX, this.centerY - 50, 'help_bg').setScale(STYLE_SCALE);
 
     for (let i = 0; i < this.totalPages; i++) {
       const pageContainer = this.add.container(0, 0).setVisible(false);
+      const pageImage = this.add.image(this.centerX, this.centerY - 50, `help_${i + 1}`).setScale(STYLE_SCALE);
       const pageText = this.add.image(this.centerX, this.sys.game.config.height - 120, `help_text_${i + 1}`).setScale(STYLE_SCALE);
-      pageContainer.add([pageText]);
+      pageContainer.add([pageImage, pageText]);
       this.pages.push(pageContainer);
     }
   }
