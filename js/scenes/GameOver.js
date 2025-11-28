@@ -1,37 +1,5 @@
-import { FONT_TMONEY_BOLD, FONT_KKATURI } from '../config.js';
+import { FONT_KKATURI } from '../config.js';
 import { createOverlay } from '../utils.js';
-
-const baseTextStyle = { fontSize: '60px',  fontFamily: FONT_TMONEY_BOLD }
-const yellowStyle = { ...baseTextStyle, color: '#fddc3e' }
-const whiteStyle = { ...baseTextStyle, color: '#ffffff' }
-const purpleStyle = { ...baseTextStyle, color: '#c4a5fd' }
-
-const reasonTextMap = {
-  hit_enemy: [
-    { text: '꿀벌', style: yellowStyle },
-    { text: '이 ', style: whiteStyle },
-    { text: '적', style: purpleStyle },
-    { text: '과 부딪혔어요!', style: whiteStyle }
-  ],
-  hit_trail: [
-    { text: '꿀벌', style: yellowStyle },
-    { text: '이 ', style: whiteStyle },
-    { text: '선', style: purpleStyle },
-    { text: '에 닿았어요!', style: whiteStyle }
-  ],
-  enemy_hit_trail: [
-    { text: '적', style: yellowStyle },
-    { text: '이 ', style: whiteStyle },
-    { text: '선', style: purpleStyle },
-    { text: '에 닿았어요!', style: whiteStyle }
-  ],
-  default: [
-    { text: '꿀벌', style: yellowStyle },
-    { text: '이 ', style: whiteStyle },
-    { text: '선', style: purpleStyle },
-    { text: '에 닿았어요!', style: whiteStyle }
-  ]
-};
 
 const balloonText = [
   '아쉬워!\n할 수 있었는데!',
@@ -82,7 +50,18 @@ export default class GameOverScene extends Phaser.Scene {
    * UI요소 생성
    */
   createUI() {
-    this.add.image(this.centerX, this.centerY - 130, 'game_over_bee');
+    const bee = this.add.image(this.centerX, this.centerY - 130, 'game_over_bee');
+
+    this.tweens.add({
+      targets: bee,
+      y: bee.y - 10,   // 위로 10px 이동
+      duration: 800,          // 0.8초
+      ease: 'Sine.easeInOut',
+      yoyo: true,
+      repeat: -1,              // 무한 반복
+      delay: 500
+    });
+
     this.add.image(915, 167, 'game_over_balloon');
     this.add.image(this.centerX, this.centerY + 100, 'game_over_text_box');
   }
@@ -102,7 +81,10 @@ export default class GameOverScene extends Phaser.Scene {
     const returnButton = this.add.sprite(this.centerX, this.centerY + 260, 'return_button').setInteractive({ useHandCursor: true });
     returnButton.on('pointerover', () => returnButton.setFrame(1));    
     returnButton.on('pointerout', () => returnButton.setFrame(0));    
-    returnButton.on('pointerdown', () => this.chageScene());
+    returnButton.on('pointerdown', () => {
+      this.sound.play('click');
+      this.chageScene();
+    });
   }
 
   /**
@@ -117,21 +99,7 @@ export default class GameOverScene extends Phaser.Scene {
    * game over 상태에 따라 text 변경
    */
   createResonText() {
-    const textParts = reasonTextMap[this.reason] || reasonTextMap.default;
-    const textContainer = this.add.container(0, 0);
-    let currentX = 0;
-
-    for (const part of textParts) {
-      const text = this.add.text(0, 0, part.text, part.style);
-      text.setX(currentX);
-      currentX += text.width;
-      textContainer.add(text);
-    }
-
-    // 컨테이너 크기 계산
-    const bounds = textContainer.getBounds();
-    // 중앙 정렬 위치로 이동
-    textContainer.setPosition(this.centerX - bounds.width / 2, this.centerY + 50);
+    this.add.image(this.centerX, this.centerY + 96, `${this.reason}_text`);
   }
 
   /**
@@ -140,14 +108,6 @@ export default class GameOverScene extends Phaser.Scene {
   createBalloonText() {
     const randomIndex = Math.floor(Math.random() * balloonText.length);
     const balloonMessage = balloonText[randomIndex];
-    const balloonContainer = this.add.container(0, 0);
-    const balloonTextObj = this.add.text(0, 0, balloonMessage, { fontSize: '32px', fontFamily: FONT_KKATURI, color: '#000000', align: 'center' });
-    
-    // 컨테이너 크기 계산
-    const bounds = balloonTextObj.getBounds();
-    // 중앙 정렬 위치로 이동
-    balloonTextObj.setPosition(-bounds.width / 2, -bounds.height / 2);
-    balloonContainer.add(balloonTextObj);
-    balloonContainer.setPosition(this.centerX + 280, this.centerY - 210);
+    this.add.text(916, 154, balloonMessage, { fontSize: '32px', fontFamily: FONT_KKATURI, color: '#000000', align: 'center' }).setOrigin(0.5, 0.5);
   }
 }

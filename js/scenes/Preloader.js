@@ -121,7 +121,11 @@ export default class Preloader extends Phaser.Scene {
     // gameOverScene
     this.load.image("game_over_bee", "assets/img/over/over_bee.png"); // 꿀벌 이미지 경로    
     this.load.image("game_over_balloon", "assets/img/over/over_ballon.png"); // 꿀벌 말풍선
-    this.load.image("game_over_text_box", "assets/img/over/over_text_box.png");     
+    this.load.image("game_over_text_box", "assets/img/over/over_text_box.png"); 
+    
+    this.load.image('hit_trail_text', 'assets/img/over/hit_trail_text.png');
+    this.load.image('hit_enemy_text', 'assets/img/over/hit_enemy_text.png');
+    this.load.image('enemy_hit_trail_text', 'assets/img/over/enemy_hit_trail_text.png');
 
     //medalScene
     this.load.image("medal_bg", "assets/img/medal/medal_bg.png"); // 꿀벌 이미지 경로    
