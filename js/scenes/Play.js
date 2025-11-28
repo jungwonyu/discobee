@@ -4,6 +4,7 @@ import MiniMap from '../MiniMap.js';
 import EnemyManager from '../manager/EnemyManager.js';
 import ItemManager from '../manager/ItemManager.js';
 import { WORLD_SIZE, CANVAS_SIZE, HEXAGON_SIZE, PLAY_SPEED, TURN_EASE, LINE_INTERVAL, TRAIL_WIDTH, TRAIL_COLOR, EARLY_ENEMY_COUNT, EARLY_ENEMY_SPEED, EARLY_ENEMY_RANGE, EARLY_ENEMY_RADIUS } from '../config';
+import { bgmManager } from '../manager/BgmManager.js';
 
 export default class PlayScene extends Phaser.Scene {
   constructor() {
@@ -94,7 +95,7 @@ export default class PlayScene extends Phaser.Scene {
   }
 
   // 꼬리 경로에 해당하는 타일에 테두리 그리기
-  drawHexBorder(x, y, color = 0xff3366, lineWidth = 4) {
+  drawHexBorder(x, y, color = 0x5092FF, lineWidth = 4) {
     const w = this.hexagonSize.w;
     const h = this.hexagonSize.h;
     const hw = w / 2;
@@ -622,6 +623,8 @@ export default class PlayScene extends Phaser.Scene {
   gameOver(reason = 'hit_trail') {
     // 물리 & 입력 정지
     if (this.isGameOver) return;
+    bgmManager.stop();
+    this.sound.play('lose');
     this.isGameOver = true;
     this.physics.world.pause();
     this.player.setVelocity(0, 0);

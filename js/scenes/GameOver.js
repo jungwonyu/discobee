@@ -1,7 +1,7 @@
-import { FONT_FAMILY } from '../config.js';
+import { FONT_TMONEY_BOLD, FONT_KKATURI } from '../config.js';
 import { createOverlay } from '../utils.js';
 
-const baseTextStyle = { fontSize: '60px',  fontFamily: FONT_FAMILY }
+const baseTextStyle = { fontSize: '60px',  fontFamily: FONT_TMONEY_BOLD }
 const yellowStyle = { ...baseTextStyle, color: '#fddc3e' }
 const whiteStyle = { ...baseTextStyle, color: '#ffffff' }
 const purpleStyle = { ...baseTextStyle, color: '#c4a5fd' }
@@ -26,7 +26,10 @@ const reasonTextMap = {
     { text: '에 닿았어요!', style: whiteStyle }
   ],
   default: [
-    { text: '게임 오버!', style: whiteStyle }
+    { text: '꿀벌', style: yellowStyle },
+    { text: '이 ', style: whiteStyle },
+    { text: '선', style: purpleStyle },
+    { text: '에 닿았어요!', style: whiteStyle }
   ]
 };
 
@@ -79,9 +82,9 @@ export default class GameOverScene extends Phaser.Scene {
    * UI요소 생성
    */
   createUI() {
-    this.add.image(this.centerX - 100, this.centerY - 130, 'bee_gameOver').setScale(0.6667);
-    this.add.image(this.centerX + 150, this.centerY - 150, 'balloon_gameOver').setScale(0.6667);
-    this.add.image(this.centerX, this.centerY + 90, 'text_box').setScale(0.6667);
+    this.add.image(this.centerX, this.centerY - 130, 'game_over_bee');
+    this.add.image(915, 167, 'game_over_balloon');
+    this.add.image(this.centerX, this.centerY + 100, 'game_over_text_box');
   }
 
   /**
@@ -96,7 +99,7 @@ export default class GameOverScene extends Phaser.Scene {
    * 버튼 생성
    */
   createButton() {
-    const returnButton = this.add.image(this.centerX, this.centerY + 245, 'return_btn').setScale(0.6667).setInteractive({ useHandCursor: true });
+    const returnButton = this.add.sprite(this.centerX, this.centerY + 260, 'return_button').setInteractive({ useHandCursor: true });
     returnButton.on('pointerover', () => returnButton.setFrame(1));    
     returnButton.on('pointerout', () => returnButton.setFrame(0));    
     returnButton.on('pointerdown', () => this.chageScene());
@@ -138,13 +141,13 @@ export default class GameOverScene extends Phaser.Scene {
     const randomIndex = Math.floor(Math.random() * balloonText.length);
     const balloonMessage = balloonText[randomIndex];
     const balloonContainer = this.add.container(0, 0);
-    const balloonTextObj = this.add.text(0, 0, balloonMessage, { fontSize: '48px', fontFamily: FONT_FAMILY, color: '#000000', align: 'center' });
+    const balloonTextObj = this.add.text(0, 0, balloonMessage, { fontSize: '32px', fontFamily: FONT_KKATURI, color: '#000000', align: 'center' });
     
     // 컨테이너 크기 계산
     const bounds = balloonTextObj.getBounds();
     // 중앙 정렬 위치로 이동
     balloonTextObj.setPosition(-bounds.width / 2, -bounds.height / 2);
     balloonContainer.add(balloonTextObj);
-    balloonContainer.setPosition(this.centerX + 170, this.centerY - 150);
+    balloonContainer.setPosition(this.centerX + 280, this.centerY - 210);
   }
 }

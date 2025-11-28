@@ -1,13 +1,40 @@
-import { createOverlay, addHoverEffect } from '../utils.js';
+import { createOverlay, addHoverEffect, addHoverEffectFrame } from '../utils.js';
 import { bgmManager } from "../manager/BgmManager";
 import { FONT_FAMILY } from '../config';
 
+const numberStyle = {
+  fontSize: '24px',
+  color: '#804515',
+  fontFamily: FONT_FAMILY,
+};
+
 const textStyle = {
   fontSize: '40px',
-  color: '#ffffff', 
-  fontStyle: 'bold',
+  color: '#11390E', 
   fontFamily: FONT_FAMILY
-}
+};
+
+const middleStyle = {
+  fontSize: '40px',
+  color: '#FFD33C', 
+  fontFamily: FONT_FAMILY,
+  stroke: '#942D05',         
+  strokeThickness: 5,
+  padding: { x: 0, y: -3 }
+};
+
+const resultTextMap = {
+  default: [
+    { text: '숨겨진 ', style: textStyle },
+    { text: '그림의 정체를 ', style: middleStyle },
+    { text: '밝혀내라!', style: textStyle },
+  ],
+  finish: [
+    { text: '숨겨진 ', style: textStyle },
+    { text: '그림의 정체를 ', style: middleStyle },
+    { text: '모두 밝혔다!', style: textStyle },
+  ]
+};
 
 export default class MedalScene extends Phaser.Scene {
   constructor() {
@@ -23,8 +50,8 @@ export default class MedalScene extends Phaser.Scene {
     this.centerY = this.cameras.main.height / 2;
 
     createOverlay(this, 0x000000, 0.7);
-    this.createButton();
     this.createUI();
+    this.createButton();
     this.initBgm();
   }
 
@@ -36,9 +63,12 @@ export default class MedalScene extends Phaser.Scene {
    * 버튼 생성
    */
   createButton() {
-    const texture = this.remainingQuizzes?.length > 0 ? 'start_btn' : 'reset_btn';
-    this.actionButton = this.add.image(this.centerX, 660, texture).setScale(0.6667).setInteractive({ useHandCursor: true });
-    this.homeButton = this.add.image(50, 50, 'home_btn').setOrigin(0,0).setInteractive({ useHandCursor: true });
+    const texture = this.remainingQuizzes?.length > 0 ? 'start_button' : 'reset_button';
+    this.actionButton = this.add.image(this.centerX, 640, texture).setInteractive({ useHandCursor: true });
+    this.homeButton = this.add.image(50, 50, 'home_button').setInteractive({ useHandCursor: true });
+
+    addHoverEffectFrame(this.homeButton);
+    addHoverEffectFrame(this.actionButton);
 
     this.homeButton.on('pointerdown', () => {
       this.sound.play('click');
@@ -50,7 +80,6 @@ export default class MedalScene extends Phaser.Scene {
       this.changeScene();
     });
 
-    addHoverEffect(this.actionButton, `${texture}`);
     this.createBgmButton();
   }
 
@@ -72,45 +101,46 @@ export default class MedalScene extends Phaser.Scene {
    * UI요소 생성
    */
   createUI() {
-    this.add.image(250, this.centerY + 15, 'bee_medal');
-    this.medalUI = this.createMedalBox().setPosition(this.centerX - 150, this.centerY - 40);
+    this.add.image(this.centerX, this.centerY - 30, 'medal_bg');
+    this.createResultText();
+    this.createMedalBox();
   }
   
   /**
    * 메달 박스 생성
    */
   createMedalBox() {
-    const titleText = this.remainingQuizzes?.length > 0 ? '숨겨진 그림의 정체를 밝혀내라!' : '숨겨진 그림의 정체를 모두 밝혔다!';
     const medals = this.registry.get('myMedals') || { 1: 0, 2: 0, 3: 0, 4: 0 };
 
-    const medalContainer = this.add.container(0, 0);
-
-    const boxWidth = 700;
-    const boxHeight = 180;
-    const text = this.add.text(boxWidth / 2, -60, titleText, textStyle).setOrigin(0.5);
-
-    const medalBox = this.add.graphics();
-    medalBox.lineStyle(4, 0xfddc3e, 1);
-    medalBox.fillStyle(0x000000, 0.5);
-    medalBox.strokeRoundedRect(0, 0, boxWidth, boxHeight, 15);
-    medalBox.fillRoundedRect(0, 0, boxWidth, boxHeight, 15);
-
-    const elements = [medalBox, text];
-
-    const medalKeys = ['medal_1', 'medal_2', 'medal_3', 'medal_4'];
-    const step = boxWidth / medalKeys.length;
-
-    medalKeys.forEach((key, index) => {
-      const x = step * (index + 0.5);
-      const y = 70;
-      const medalImg = this.add.image(x, y, key).setScale(1.2);
-      const medalText = this.add.text(x, y + 70, `${medals[index + 1]}`, textStyle).setOrigin(0.5);
-
-      elements.push(medalImg, medalText)
+    const medalInfo = [ 
+      { x: this.centerX - 267, y: 390,  medalId: 1 }, // 다이아
+      { x: this.centerX - 85, y: 390, medalId: 2 }, // 금
+      { x: this.centerX + 96, y: 390, medalId: 3 }, // 은
+      { x: this.centerX + 277, y: 390, medalId: 4 }  // 동
+    ]
+    
+     medalInfo.forEach((info) => {
+      const {key, x, y, medalId} = info;
+      this.add.text(info.x, y + 70, `${medals[medalId]}`, numberStyle).setOrigin(0.5);
     });
+  }
 
-    medalContainer.add(elements);
-    return medalContainer;
+  createResultText() {
+    const textParts = this.remainingQuizzes?.length > 0 ? resultTextMap.default : resultTextMap.finish;
+    const textContainer = this.add.container(0, 0);
+    let currentX = 0;
+
+    for (const part of textParts) {
+      const text = this.add.text(0, 0, part.text, part.style);
+      text.setX(currentX);
+      currentX += text.width;
+      textContainer.add(text);
+    }
+
+    // 컨테이너 크기 계산
+    const bounds = textContainer.getBounds();
+    // 중앙 정렬 위치로 이동
+    textContainer.setPosition(this.centerX - bounds.width / 2, this.centerY + 130);
   }
 
   
@@ -118,9 +148,10 @@ export default class MedalScene extends Phaser.Scene {
    * BGM 토글 버튼 생성 및 상태 이벤트 등록
    */
   createBgmButton() {
-    this.bgmBtn = this.add.image(1140, 610, 'bgm_O').setInteractive({ useHandCursor: true }).setScrollFactor(0);
+    this.bgmButton = this.add.image(1243, 686, 'volume_button').setInteractive({ useHandCursor: true }).setScrollFactor(0);
     this.updateBgmButtonTexture(!bgmManager.isOn);
-    this.bgmBtn.on('pointerdown', () => {
+    addHoverEffectFrame(this.bgmButton);
+    this.bgmButton.on('pointerdown', () => {
       bgmManager.toggle();
       this.updateBgmButtonTexture(!bgmManager.isOn);
       this.sound.play('click');
@@ -128,6 +159,6 @@ export default class MedalScene extends Phaser.Scene {
   }
 
   updateBgmButtonTexture(isPlaying) {
-    this.bgmBtn.setTexture(isPlaying ? 'bgm_X' : 'bgm_O');
+    this.bgmButton.setTexture(isPlaying ? 'mute_button' : 'volume_button');
   }
 }

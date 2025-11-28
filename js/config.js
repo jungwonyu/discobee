@@ -7,12 +7,14 @@ export const WORLD_SIZE = {
   height: (TILE_GRID.row - 1) * HEXAGON_SIZE.height + HEXAGON_SIZE.height 
 };
 
+export const STYLE_SCALE = 0.6667;
+
 export const PLAY_SPEED = 150;
 export const TURN_EASE = 5;
 export const LINE_INTERVAL = 10;
 
 export const TRAIL_WIDTH = 10;
-export const TRAIL_COLOR = '0xff3366';
+export const TRAIL_COLOR = '0x5092FF';
 
 export const EARLY_ENEMY_COUNT = 30;
 export const EARLY_ENEMY_SPEED = 60;
@@ -20,3 +22,7 @@ export const EARLY_ENEMY_RANGE = 100;
 export const EARLY_ENEMY_RADIUS = 10;
 
 export const FONT_FAMILY = 'Cafe24Surround';
+export const FONT_TMONEY_REGULAR = 'TMONEYROUNDWINDREGULAR';
+export const FONT_TMONEY_BOLD = 'TMoneyDungunbaram';
+export const FONT_KKATURI = 'Eommakkaturi';
+export const FONT_MAPLESTORY_BOLD = 'MaplestoryBold';

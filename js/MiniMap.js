@@ -1,4 +1,4 @@
-import { getMedalNumber, addHoverEffectFrame } from './utils.js';
+import { getMedalNumber, addHoverEffect } from './utils.js';
 
 /**
  * MiniMap 클래스
@@ -47,6 +47,7 @@ export default class MiniMap {
 		const pad = 10;
 		const maxW = 250;
     const maxH = 250;
+		const bgY = 188;
 		const sourceW = scene.world.w;
 		const sourceH = scene.world.h;
 
@@ -56,16 +57,19 @@ export default class MiniMap {
 		const vy = pad;
 		const zoom = miniW / sourceW;
 
+		// 미니맵 배경 이미지 추가
+		const minimapBg = scene.add.image(vx + 14, bgY, 'minimap_bg').setOrigin(0).setScrollFactor(0).setScale(0.65).setDepth(998);
+
 		// 미니맵 카메라 생성
 		this.minimapCam = scene.cameras.add(vx, vy, miniW, miniH).setBounds(0, 0, sourceW, sourceH).setZoom(zoom).setName('minimap');
 
 		// UI 생성 (버튼/메달)
-		this.createQuizButtonAndMedal({ vx, vy, miniW, miniH });
+		this.createQuizButtonAndMedal();
 
 		// 미니맵 카메라에서 hexa(기본 육각형) 타일만 무시(딤은 포함)
 		if (scene.hexagonList && Array.isArray(scene.hexagonList)) {
 			const hexas = scene.hexagonList.filter(hex => hex.texture && hex.texture.key === 'hexagon');
-			this.minimapCam.ignore([...hexas, this.quizButton, this.medalIcon]);
+			this.minimapCam.ignore([...hexas, minimapBg, this.quizButton, this.medalIcon]);
 		}
 
 		// PlayScene에서 메달 아이콘 참조 가능하도록 연결
@@ -75,26 +79,22 @@ export default class MiniMap {
 	/**
 	 * 퀴즈 버튼, 메달 아이콘 생성 및 배치
 	 */
-	createQuizButtonAndMedal({ vx, vy, miniW, miniH }) {
-		const BUTTON_SCALE = 0.6667;
-		const BUTTON_OFFSET_Y = 50;
-		const MEDAL_OFFSET_X = -220;
-		const MEDAL_SCALE = 0.7;
+	createQuizButtonAndMedal() {
+		const SCALE = 0.6667;
 		const scene = this.scene;
-
-		// 퀴즈 버튼
-		const buttonX = vx + miniW / 2;
-		const buttonY = vy + miniH + BUTTON_OFFSET_Y;
-		this.quizButton = scene.add.image(buttonX, buttonY, 'quiz_start').setScale(BUTTON_SCALE).setScrollFactor(0).setDepth(9999).setInteractive({ useHandCursor: true });
-    addHoverEffectFrame(this.quizButton);
+		const buttonX = 1182;
+		const buttonY = 298;
+		
+		this.quizButton = scene.add.image(buttonX, buttonY, 'quiz_start').setScale(SCALE).setScrollFactor(0).setDepth(9999).setInteractive({ useHandCursor: true });
+    addHoverEffect(this.quizButton, 'quiz_start');
 		this.quizButton.on('pointerdown', this.snapshot, this);
 
 		// 메달 아이콘
 		const medalNumber = getMedalNumber(this.hexagonPercent());
-		const medalKey = `medal_${medalNumber}`;
-		const medalX = buttonX + this.quizButton.displayWidth / 2 + MEDAL_OFFSET_X;
+		const medalKey = `mini_medal_${medalNumber}`;
+		const medalX = 1082;
 		const medalY = buttonY;
-		this.medalIcon = scene.add.image(medalX, medalY, medalKey).setScale(MEDAL_SCALE).setScrollFactor(0).setDepth(9999);
+		this.medalIcon = scene.add.image(medalX, medalY, medalKey).setScale(SCALE).setScrollFactor(0).setDepth(9999);
 	}
 
 	/**
@@ -112,7 +112,7 @@ export default class MiniMap {
 		const itemGroup = scene.itemManager?.items || scene.items;
 		const effects = scene.activeEffects || [];
 		const toHide = [scene.player, scene.enemies, this.minimapCam, this.quizButton, itemGroup, scene.trailGraphics, ...effects];
-		const toHideHex = scene.stage.hexagonList.filter(tile => tile.visible !== false && tile.texture && tile.texture.key !== 'limit');
+		const toHideHex = scene.stage.hexagonList.filter(tile => tile.visible !== false);
 		const toHideBgDim = [scene.stage.bgDim];
 		[...toHide, ...toHideHex, ...toHideBgDim].forEach(obj => obj && obj.setVisible(false));
 
@@ -166,7 +166,7 @@ export default class MiniMap {
 	updateMedal() {
 		if (this.medalIcon) {
 			const medalNumber = getMedalNumber(this.hexagonPercent());
-			const medalKey = `medal_${medalNumber}`;
+			const medalKey = `mini_medal_${medalNumber}`;
 			this.medalIcon.setTexture(medalKey);
 		}
 	}

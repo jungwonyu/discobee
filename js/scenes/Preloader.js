@@ -56,47 +56,40 @@ export default class Preloader extends Phaser.Scene {
   }
 
   preload() {
+    // fonts
+    this.load.font("Cafe24Surround", "assets/font/Cafe24Ssurround-v2.0.ttf");
+    this.load.font("TMoneyDungunbaram", "assets/font/TMONEYROUNDWINDEXTRABOLD.TTF");
+    this.load.font("Eommakkaturi", "assets/font/Katuri.woff");
+    this.load.font("MaplestoryBold", "assets/font/MaplestoryBold.ttf");
+
     //  bgmScene
     this.load.audio("bgm_audio", "./assets/mp3/bgm.mp3");
+    this.load.audio("lose", "./assets/mp3/lose.mp3");
+
     this.load.audio("click", "./assets/mp3/click.mp3");
-    this.load.image("bgm_O", "assets/img/start/bgm_O.png");
-    this.load.image("bgm_X", "assets/img/start/bgm_X.png");
 
     //  startScene
     this.load.image("bg", "assets/img/start/start_bg.png");
     this.load.image("start_title", "assets/img/start/start_title.png");
     this.load.image("start_char", "assets/img/start/start_char.png");
 
-    this.load.spritesheet("start_btn", "assets/img/start/start_btn.png", {
-      frameWidth: 383.5,
-      frameHeight: 143,
-    });
-
-    this.load.spritesheet("how_btn", "assets/img/start/howToPlay_btn.png", {
-      frameWidth: 141,
-      frameHeight: 122,
-    });
-
-    this.load.image("howToPlay", "assets/img/start/howToPlay.png");
-
-    this.load.image("close_btn", "assets/img/start/close_btn.png");
-    this.load.image("close_btn_h", "assets/img/start/close_btn_h.png");
+    this.load.image("start_btn", "assets/img/start/start_btn.png");
+    this.load.image("start_btn_h", "assets/img/start/start_btn_h.png");
+    this.load.image("how_btn", "assets/img/start/how_btn.png");
+    this.load.image("how_btn_h", "assets/img/start/how_btn_h.png");
 
     // help scene
-    this.load.image("play_btn", "assets/img/help/play_btn.png");
-    this.load.image("pause_btn", "assets/img/help/pause_btn.png");
-
-    // help buttons
-    this.load.image("help_next_btn", "assets/img/help/next_btn.png");
-    this.load.image("help_next_btn_h", "assets/img/help/next_btn_h.png");
-    this.load.image("help_prev_btn", "assets/img/help/prev_btn.png");
-    this.load.image("help_prev_btn_h", "assets/img/help/prev_btn_h.png");
-    
-    // help videos
-    this.load.video("help-video-1", "assets/img/video/semple.mp4");
-    this.load.video("help-video-2", "assets/img/video/semple.mp4");
-    this.load.video("help-video-3", "assets/img/video/semple.mp4");
-    this.load.video("help-video-4", "assets/img/video/semple.mp4");
+    this.load.image("help_next_btn", "assets/img/help/help_next_btn.png");
+    this.load.image("help_next_btn_h", "assets/img/help/help_next_btn_h.png");
+    this.load.image("help_prev_btn", "assets/img/help/help_prev_btn.png");
+    this.load.image("help_prev_btn_h", "assets/img/help/help_prev_btn_h.png");
+    this.load.image("close_btn", "assets/img/help/close_btn.png");
+    this.load.image("close_btn_h", "assets/img/help/close_btn_h.png");
+    this.load.image("help_bg", "assets/img/help/help_bg.png");
+    this.load.image("help_text_1", "assets/img/help/help_text_1.png");
+    this.load.image("help_text_2", "assets/img/help/help_text_2.png");
+    this.load.image("help_text_3", "assets/img/help/help_text_3.png");
+    this.load.image("help_text_4", "assets/img/help/help_text_4.png");
 
     //playScene
     this.load.image("hexagon", "assets/img/play/hexagon.png"); // 육각형
@@ -122,49 +115,99 @@ export default class Preloader extends Phaser.Scene {
       frameHeight: 200,
     });
 
-    this.load.spritesheet("quiz_start", "assets/img/play/quiz_start.png", {
-      frameWidth: 274,
-      frameHeight: 99,
+    // gameOverScene
+    this.load.image("game_over_bee", "assets/img/over/over_bee.png"); // 꿀벌 이미지 경로    
+    this.load.image("game_over_balloon", "assets/img/over/over_ballon.png"); // 꿀벌 말풍선
+    this.load.image("game_over_text_box", "assets/img/over/over_text_box.png");     
+
+    //medalScene
+    this.load.image("medal_bg", "assets/img/medal/medal_bg.png"); // 꿀벌 이미지 경로    
+
+    // button
+    this.load.spritesheet("return_button", "assets/img/button/return_button.png", { 
+      frameWidth: 215.5,
+      frameHeight: 103 
     });
 
-    // gameOverScene
-    this.load.image("bee_gameOver", "assets/img/over/bee.png"); // 꿀벌 이미지 경로    
-    this.load.image("balloon_gameOver", "assets/img/over/balloon.png"); // 꿀벌 말풍선
-    this.load.image("text_box", "assets/img/over/text_box.png"); 
-    // 리셋
-    this.load.spritesheet("return_btn", "assets/img/over/return_btn.png", { frameWidth: 361.5,frameHeight: 134 });
+    this.load.spritesheet('home_button', 'assets/img/button/home_button.png', {
+      frameWidth: 72,
+      frameHeight: 74,
+    }); 
+
+    this.load.spritesheet("reset_button", "assets/img/button/reset_button.png", {
+      frameWidth: 218,
+      frameHeight: 105,
+    }); 
+
+    this.load.spritesheet("volume_button", "assets/img/button/volume_button.png", {
+      frameWidth: 72,
+      frameHeight: 73,
+    }); 
+
+    this.load.spritesheet("mute_button", "assets/img/button/mute_button.png", {
+      frameWidth: 72,
+      frameHeight: 73,
+    }); 
+
+    this.load.spritesheet("start_button", "assets/img/button/start_button.png", {
+      frameWidth: 231,
+      frameHeight: 106,
+    });
+
+    // map
+    this.load.image("quiz_start", "assets/img/map/quiz_start.png");
+    this.load.image("quiz_start_h", "assets/img/map/quiz_start_h.png");
+    this.load.image("mini_medal_1", "assets/img/map/mini_medal_1.png");
+    this.load.image("mini_medal_2", "assets/img/map/mini_medal_2.png");
+    this.load.image("mini_medal_3", "assets/img/map/mini_medal_3.png");
+    this.load.image("mini_medal_4", "assets/img/map/mini_medal_4.png");
+    this.load.image("map_bg", "assets/img/quiz/map_bg.png");
 
     // quizScene
-    this.load.spritesheet('bee_incorrect', 'assets/img/quiz/bee_incorrect.png', { frameWidth: 170, frameHeight: 223 });
+    this.load.image("quiz_bg", "assets/img/quiz/quiz_bg.png"); 
+    this.load.image("word_bg", "assets/img/quiz/word_bg.png");
+    this.load.image("word_bg_h", "assets/img/quiz/word_bg_h.png");
+
+    this.load.image("text_incorrect", "assets/img/quiz/text_incorrect.png");
+    this.load.image("text_1", "assets/img/quiz/text_1.png");
+    this.load.image("text_2", "assets/img/quiz/text_2.png");
+    this.load.image("text_3", "assets/img/quiz/text_3.png");
+    this.load.image("text_4", "assets/img/quiz/text_4.png");
+
+    this.load.spritesheet('incorrect_1', 'assets/img/quiz/incorrect_1.png', { frameWidth: 355.2, frameHeight: 448 });
+    this.load.spritesheet('incorrect_2', 'assets/img/quiz/incorrect_2.png', { frameWidth: 355.2, frameHeight: 448 });
+    this.load.spritesheet('incorrect_3', 'assets/img/quiz/incorrect_3.png', { frameWidth: 355.2, frameHeight: 448 });
+    this.load.spritesheet('incorrect_4', 'assets/img/quiz/incorrect_4.png', { frameWidth: 355.2, frameHeight: 448 });
+    this.load.spritesheet('incorrect_5', 'assets/img/quiz/incorrect_5.png', { frameWidth: 355.2, frameHeight: 448 });
 
     // 메달
     this.load.image("medal_1", "assets/img/quiz/medal_1.png"); // 다이아 메달
-    this.load.spritesheet('medal_1_1', 'assets/img/quiz/medal_1_1.png', { frameWidth: 505.5, frameHeight: 591 });
-    this.load.spritesheet('medal_1_2', 'assets/img/quiz/medal_1_2.png', { frameWidth: 505.5, frameHeight: 591 });
-    this.load.spritesheet('medal_1_3', 'assets/img/quiz/medal_1_3.png', { frameWidth: 505.5, frameHeight: 591 });
-    this.load.spritesheet('medal_1_4', 'assets/img/quiz/medal_1_4.png', { frameWidth: 505.5, frameHeight: 591 });
-    this.load.spritesheet('medal_1_5', 'assets/img/quiz/medal_1_5.png', { frameWidth: 505.5, frameHeight: 591 });
+    this.load.spritesheet('medal_1_1', 'assets/img/quiz/medal_1_1.png', { frameWidth: 506.5, frameHeight: 592 });
+    this.load.spritesheet('medal_1_2', 'assets/img/quiz/medal_1_2.png', { frameWidth: 506.5, frameHeight: 592 });
+    this.load.spritesheet('medal_1_3', 'assets/img/quiz/medal_1_3.png', { frameWidth: 506.5, frameHeight: 592 });
+    this.load.spritesheet('medal_1_4', 'assets/img/quiz/medal_1_4.png', { frameWidth: 506.5, frameHeight: 592 });
+    this.load.spritesheet('medal_1_5', 'assets/img/quiz/medal_1_5.png', { frameWidth: 506.5, frameHeight: 592 });
 
     this.load.image("medal_2", "assets/img/quiz/medal_2.png"); // 금 메달
-    this.load.spritesheet('medal_2_1', 'assets/img/quiz/medal_2_1.png', { frameWidth: 505.5, frameHeight: 591 });
-    this.load.spritesheet('medal_2_2', 'assets/img/quiz/medal_2_2.png', { frameWidth: 505.5, frameHeight: 591 });
-    this.load.spritesheet('medal_2_3', 'assets/img/quiz/medal_2_3.png', { frameWidth: 505.5, frameHeight: 591 });
-    this.load.spritesheet('medal_2_4', 'assets/img/quiz/medal_2_4.png', { frameWidth: 505.5, frameHeight: 591 });
-    this.load.spritesheet('medal_2_5', 'assets/img/quiz/medal_2_5.png', { frameWidth: 505.5, frameHeight: 591 });
+    this.load.spritesheet('medal_2_1', 'assets/img/quiz/medal_2_1.png', { frameWidth: 506.5, frameHeight: 592 });
+    this.load.spritesheet('medal_2_2', 'assets/img/quiz/medal_2_2.png', { frameWidth: 506.5, frameHeight: 592 });
+    this.load.spritesheet('medal_2_3', 'assets/img/quiz/medal_2_3.png', { frameWidth: 506.5, frameHeight: 592 });
+    this.load.spritesheet('medal_2_4', 'assets/img/quiz/medal_2_4.png', { frameWidth: 506.5, frameHeight: 592 });
+    this.load.spritesheet('medal_2_5', 'assets/img/quiz/medal_2_5.png', { frameWidth: 506.5, frameHeight: 592 });
 
     this.load.image("medal_3", "assets/img/quiz/medal_3.png"); // 은 메달
-    this.load.spritesheet('medal_3_1', 'assets/img/quiz/medal_3_1.png', { frameWidth: 505.5, frameHeight: 591 });
-    this.load.spritesheet('medal_3_2', 'assets/img/quiz/medal_3_2.png', { frameWidth: 505.5, frameHeight: 591 });
-    this.load.spritesheet('medal_3_3', 'assets/img/quiz/medal_3_3.png', { frameWidth: 505.5, frameHeight: 591 });
-    this.load.spritesheet('medal_3_4', 'assets/img/quiz/medal_3_4.png', { frameWidth: 505.5, frameHeight: 591 });
-    this.load.spritesheet('medal_3_5', 'assets/img/quiz/medal_3_5.png', { frameWidth: 505.5, frameHeight: 591 });
+    this.load.spritesheet('medal_3_1', 'assets/img/quiz/medal_3_1.png', { frameWidth: 506.5, frameHeight: 592 });
+    this.load.spritesheet('medal_3_2', 'assets/img/quiz/medal_3_2.png', { frameWidth: 506.5, frameHeight: 592 });
+    this.load.spritesheet('medal_3_3', 'assets/img/quiz/medal_3_3.png', { frameWidth: 506.5, frameHeight: 592 });
+    this.load.spritesheet('medal_3_4', 'assets/img/quiz/medal_3_4.png', { frameWidth: 506.5, frameHeight: 592 });
+    this.load.spritesheet('medal_3_5', 'assets/img/quiz/medal_3_5.png', { frameWidth: 506.5, frameHeight: 592 });
 
     this.load.image("medal_4", "assets/img/quiz/medal_4.png"); // 동 메달
-    this.load.spritesheet('medal_4_1', 'assets/img/quiz/medal_4_1.png', { frameWidth: 505.5, frameHeight: 591 });
-    this.load.spritesheet('medal_4_2', 'assets/img/quiz/medal_4_2.png', { frameWidth: 505.5, frameHeight: 591 });
-    this.load.spritesheet('medal_4_3', 'assets/img/quiz/medal_4_3.png', { frameWidth: 505.5, frameHeight: 591 });
-    this.load.spritesheet('medal_4_4', 'assets/img/quiz/medal_4_4.png', { frameWidth: 505.5, frameHeight: 591 });
-    this.load.spritesheet('medal_4_5', 'assets/img/quiz/medal_4_5.png', { frameWidth: 505.5, frameHeight: 591 });
+    this.load.spritesheet('medal_4_1', 'assets/img/quiz/medal_4_1.png', { frameWidth: 506.5, frameHeight: 592 });
+    this.load.spritesheet('medal_4_2', 'assets/img/quiz/medal_4_2.png', { frameWidth: 506.5, frameHeight: 592 });
+    this.load.spritesheet('medal_4_3', 'assets/img/quiz/medal_4_3.png', { frameWidth: 506.5, frameHeight: 592 });
+    this.load.spritesheet('medal_4_4', 'assets/img/quiz/medal_4_4.png', { frameWidth: 506.5, frameHeight: 592 });
+    this.load.spritesheet('medal_4_5', 'assets/img/quiz/medal_4_5.png', { frameWidth: 506.5, frameHeight: 592 });
 
     this.load.image("main_btn", "assets/img/quiz/mainPage_btn.png"); // 처음으로
     this.load.image("main_btn_h", "assets/img/quiz/mainPage_btn_h.png"); // 처음으로 호버
@@ -176,17 +219,8 @@ export default class Preloader extends Phaser.Scene {
     this.load.audio("correct", "assets/mp3/correct.mp3"); // 정답 사운드
     this.load.audio("incorrect", "assets/mp3/incorrect.mp3"); // 오답 사운드
 
-    //medalScene
-    this.load.image("medal_1", "assets/img/quiz/medal_1.png"); // 다이아
-    this.load.image("medal_2", "assets/img/quiz/medal_2.png"); // 금
-    this.load.image("medal_3", "assets/img/quiz/medal_3.png"); // 은
-    this.load.image("medal_4", "assets/img/quiz/medal_4.png"); // 동
-
-    this.load.image("reset_btn", "assets/img/medal/reset_btn.png"); // 초기화 버튼
-    this.load.image("reset_btn_h", "assets/img/medal/reset_btn_h.png");
-
-    this.load.image("home_btn", "assets/img/medal/home_btn.png"); // 홈버튼
-    this.load.image("bee_medal", "assets/img/medal/bee_medal.png"); // 메달 벌
+    // map
+    this.load.image("minimap_bg", "assets/img/map/minimap_bg.png"); 
   }
 
   create() {

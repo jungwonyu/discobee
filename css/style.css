@@ -1,11 +1,33 @@
 @charset "UTF-8";
 
+/* @font-face {
+  font-family: 'Cafe24Surround';
+  src: url('../font/Cafe24Ssurround-v2.0.ttf') format('truetype');
+  font-weight: normal;
+  font-style: normal;
+} */
+
 @font-face {
-	font-family: 'Cafe24Surround';
-	src: url('https://cdn.jsdelivr.net/gh/projectnoonnu/noonfonts_2105_2@1.0/Cafe24Ssurround.woff') format('woff');
+	font-family: 'TMONEYROUNDWINDEXTRABOLD';
+	src: url('../assets/font/TMONEYROUNDWINDEXTRABOLD.TTF') format('woff');
+	font-weight: bold;
+	font-display: swap;
+}
+
+@font-face {
+	font-family: 'TMONEYROUNDWINDREGULAR';
+	src: url('../assets/font/TMONEYROUNDWINDREGULAR.TTF') format('woff');
 	font-weight: normal;
 	font-display: swap;
 }
+
+@font-face {
+  font-family: 'Eommakkaturi';
+  src: url('../assets/font/Katuri.woff') format('woff');
+  font-weight: normal;
+  font-display: swap;
+}
+
 
 body {
   margin: 0;

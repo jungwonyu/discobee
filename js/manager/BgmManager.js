@@ -33,7 +33,6 @@ class BgmManager {
 
   stop() {
     this.bgm.stop();
-    this.isOn = false;
   }
 
   resume() {

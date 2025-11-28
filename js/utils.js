@@ -7,7 +7,7 @@
  * @param {number} alpha - 투명도 (0~1, 기본값: 0.5)
  * @returns {Phaser.GameObjects.Rectangle} Rectangle 오버레이 객체
  */
-export const createOverlay = (scene, color = 0x000000, alpha = 0.5) => {
+export const createOverlay = (scene, color = 0x000000, alpha = 0.7) => {
   const { width, height } = scene.sys.game.config;
   return scene.add.rectangle(0, 0, width, height, color, alpha).setOrigin(0, 0).setDepth(0);
 };

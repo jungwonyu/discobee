@@ -2,10 +2,10 @@
  * 시작 씬 - 게임 메인 화면
  */
 
-import { addHoverEffectFrame } from '../utils';
+import { addHoverEffect } from '../utils';
 
 const LAYOUT = {
-  TITLE: { x: 640, y: 220, scale: 0.6 },
+  TITLE: { x: 640, y: 200, scale: 0.6 },
   CHAR: { x: 600, y: 450, scale: 0.6 },
   START_BTN: { x: 640, y: 630, scale: 0.6667 },
   HOW_BTN: { x: 1180, y: 100, scale: 0.6667 },
@@ -49,8 +49,12 @@ export default class StartScene extends Phaser.Scene {
    * UI 요소(타이틀, 캐릭터) 생성
    */
   createUI() {
-    this.add.image(LAYOUT.TITLE.x, LAYOUT.TITLE.y, 'start_title').setScale(LAYOUT.TITLE.scale);
-    this.add.image(LAYOUT.CHAR.x, LAYOUT.CHAR.y, 'start_char').setScale(LAYOUT.CHAR.scale);
+    const startTitle = this.add.image(LAYOUT.TITLE.x, LAYOUT.TITLE.y - 50, 'start_title').setScale(LAYOUT.TITLE.scale);
+    const startChar = this.add.image(LAYOUT.CHAR.x + 200, LAYOUT.CHAR.y - 50, 'start_char').setScale(LAYOUT.CHAR.scale * 0.5);
+
+    // animations
+    this.tweens.add({ targets: startTitle, y: LAYOUT.TITLE.y, ease: 'Sine.easeInOut', duration: 800, yoyo: false });
+    this.tweens.add({ targets: startChar, scale: LAYOUT.CHAR.scale, x: LAYOUT.CHAR.x, y: LAYOUT.CHAR.y, ease: 'Sine.easeInOut', duration: 800, yoyo: false });
   }
 
   /**
@@ -65,9 +69,7 @@ export default class StartScene extends Phaser.Scene {
    * 시작 버튼 생성 및 이벤트 등록
    */
   createStartButton() {
-    const startButton = this.add.sprite(LAYOUT.START_BTN.x, LAYOUT.START_BTN.y, 'start_btn', 0)
-      .setInteractive({ useHandCursor: true })
-      .setScale(LAYOUT.START_BTN.scale);
+    const startButton = this.add.sprite(LAYOUT.START_BTN.x, LAYOUT.START_BTN.y, 'start_btn', 0).setInteractive({ useHandCursor: true }).setScale(LAYOUT.START_BTN.scale);
 
     startButton.on('pointerdown', () => {
       this.sound.play('click');
@@ -76,7 +78,7 @@ export default class StartScene extends Phaser.Scene {
         this.scene.start('PlayScene', { showMedalOnStart: true });
       });
     });
-    addHoverEffectFrame(startButton);
+    addHoverEffect(startButton, 'start_btn');
   }
 
   /**
@@ -86,6 +88,6 @@ export default class StartScene extends Phaser.Scene {
     const howToPlayButton = this.add.sprite(LAYOUT.HOW_BTN.x, LAYOUT.HOW_BTN.y, 'how_btn', 0).setInteractive({ useHandCursor: true }).setScale(LAYOUT.HOW_BTN.scale);
 
     howToPlayButton.on('pointerdown', () => this.scene.launch('HelpScene'));
-    addHoverEffectFrame(howToPlayButton);
+    addHoverEffect(howToPlayButton, 'how_btn');
   }
 }
