@@ -123,6 +123,7 @@ export default class Preloader extends Phaser.Scene {
 
     //medalScene
     this.load.image('medal_bg', 'assets/img/medal/medal_bg.png'); 
+    this.load.spritesheet('bee_medal', 'assets/img/medal/bee_medal.png', { frameWidth: 138, frameHeight: 229 });
 
     // button
     this.load.spritesheet('return_button', 'assets/img/button/return_button.png', { frameWidth: 215.5, frameHeight: 103 });

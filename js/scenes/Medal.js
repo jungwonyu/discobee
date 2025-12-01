@@ -104,6 +104,7 @@ export default class MedalScene extends Phaser.Scene {
     this.add.image(this.centerX, this.centerY - 30, 'medal_bg');
     this.createResultText();
     this.createMedalBox();
+    this.createAnimation();
   }
   
   /**
@@ -113,13 +114,13 @@ export default class MedalScene extends Phaser.Scene {
     const medals = this.registry.get('myMedals') || { 1: 0, 2: 0, 3: 0, 4: 0 };
 
     const medalInfo = [ 
-      { x: this.centerX - 267, y: 390,  medalId: 1 }, // 다이아
-      { x: this.centerX - 85, y: 390, medalId: 2 }, // 금
-      { x: this.centerX + 96, y: 390, medalId: 3 }, // 은
-      { x: this.centerX + 277, y: 390, medalId: 4 }  // 동
+      { x: this.centerX - 265, y: 388,  medalId: 1 }, // 다이아
+      { x: this.centerX - 84, y: 388, medalId: 2 }, // 금
+      { x: this.centerX + 97, y: 388, medalId: 3 }, // 은
+      { x: this.centerX + 277, y: 388, medalId: 4 }  // 동
     ]
     
-     medalInfo.forEach((info) => {
+    medalInfo.forEach((info) => {
       const {key, x, y, medalId} = info;
       this.add.text(info.x, y + 70, `${medals[medalId]}`, numberStyle).setOrigin(0.5);
     });
@@ -143,6 +144,20 @@ export default class MedalScene extends Phaser.Scene {
     textContainer.setPosition(this.centerX - bounds.width / 2, this.centerY + 130);
   }
 
+  createAnimation() {
+    const beeMedal = this.add.sprite(this.centerX, this.centerY - 100, 'bee_medal');
+
+    if (!this.anims.exists('bee_medal_fly')) {
+      this.anims.create({
+        key: 'bee_medal_fly',
+        frames: this.anims.generateFrameNumbers('bee_medal', { start: 0, end: 49 }),
+        frameRate: 10,
+        repeat: -1
+      });
+    }
+
+    beeMedal.play('bee_medal_fly');
+  }
   
   /**
    * BGM 토글 버튼 생성 및 상태 이벤트 등록
