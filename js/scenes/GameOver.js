@@ -61,7 +61,7 @@ export default class GameOverScene extends Phaser.Scene {
           { key: 'over_bee_3' },
           { key: 'over_bee_4' }
         ],
-        frameRate: 5,
+        frameRate: 3,
         repeat: -1
       });
     }
