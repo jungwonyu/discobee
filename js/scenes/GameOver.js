@@ -50,17 +50,23 @@ export default class GameOverScene extends Phaser.Scene {
    * UI요소 생성
    */
   createUI() {
-    const bee = this.add.image(this.centerX, this.centerY - 130, 'game_over_bee');
+    const bee = this.add.sprite(this.centerX, this.centerY - 130, 'over_bee_1');
 
-    this.tweens.add({
-      targets: bee,
-      y: bee.y - 10,   // 위로 10px 이동
-      duration: 800,          // 0.8초
-      ease: 'Sine.easeInOut',
-      yoyo: true,
-      repeat: -1,              // 무한 반복
-      delay: 500
-    });
+    if (!this.anims.exists('bee_fly')) {
+      this.anims.create({
+        key: 'bee_fly',
+        frames: [
+          { key: 'over_bee_1' },
+          { key: 'over_bee_2' },
+          { key: 'over_bee_3' },
+          { key: 'over_bee_4' }
+        ],
+        frameRate: 5,
+        repeat: -1
+      });
+    }
+
+    bee.play('bee_fly');
 
     this.add.image(915, 167, 'game_over_balloon');
     this.add.image(this.centerX, this.centerY + 100, 'game_over_text_box');

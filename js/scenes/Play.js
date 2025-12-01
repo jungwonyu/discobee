@@ -33,7 +33,20 @@ export default class PlayScene extends Phaser.Scene {
     this.initStage();
     this.trailGraphics  = this.add.graphics().setDepth(0);
     this.trailPath = [];
+
+    if (!this.anims.exists('player_fly')) {
+        this.anims.create({
+        key: 'player_fly',
+        frames: this.anims.generateFrameNumbers('player', { start: 0, end: 2 }),
+        frameRate: 10,
+        repeat: -1
+      });
+    }
+
     this.player = this.physics.add.sprite(this.playerStartTile.x, this.playerStartTile.y, 'player');
+    this.player.play('player_fly');
+
+    
     this.player.setCollideWorldBounds(true);
     this.player.setDepth(1);
     this.physics.world.setBounds(0, 0, this.world.w, this.world.h);

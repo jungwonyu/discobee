@@ -97,9 +97,8 @@ export default class Preloader extends Phaser.Scene {
     this.load.image('hexagon', 'assets/img/play/hexagon.png'); // 육각형
     this.load.image('limit', 'assets/img/play/limit.png'); // 제한 육각형
     this.load.image('my_hexagon', 'assets/img/play/hexagon_h.png'); // my 육각형
-    this.load.image('player', 'assets/img/play/player.png'); // 플레이어
-    this.load.image('player_speed', 'assets/img/play/player_speed.png'); // 부스터 플레이어
-    this.load.image('player_invincible', 'assets/img/play/player_invincible.png'); // 무적 플레이어
+    // this.load.image('player', 'assets/img/play/player.png'); // 플레이어
+    this.load.spritesheet('player', 'assets/img/play/player.png', { frameWidth: 60, frameHeight: 40 });
     this.load.image('enemy', 'assets/img/play/enemy.png'); // 적
     this.load.image('enemy_freeze', 'assets/img/play/enemy_freeze.png'); // 얼린 적
     this.load.image('item_freeze', 'assets/img/play/freeze.png'); // 얼음
@@ -109,9 +108,18 @@ export default class Preloader extends Phaser.Scene {
     this.load.spritesheet('shield_effect', 'assets/img/play/shield_effect.png', { frameWidth: 200, frameHeight: 200 });
 
     // gameOverScene
-    this.load.image('game_over_bee', 'assets/img/over/over_bee.png');
+    // this.load.image('game_over_bee', 'assets/img/over/over_bee.png');
+    this.load.spritesheet('over_bee_1', 'assets/img/over/over_bee_1.png', { frameWidth: 456, frameHeight: 300 });
+    this.load.spritesheet('over_bee_2', 'assets/img/over/over_bee_2.png', { frameWidth: 456, frameHeight: 300 });
+    this.load.spritesheet('over_bee_3', 'assets/img/over/over_bee_3.png', { frameWidth: 456, frameHeight: 300 });
+    this.load.spritesheet('over_bee_4', 'assets/img/over/over_bee_4.png', { frameWidth: 456, frameHeight: 300 });
+
     this.load.image('game_over_balloon', 'assets/img/over/over_ballon.png');
     this.load.image('game_over_text_box', 'assets/img/over/over_text_box.png');
+
+    this.load.image('hit_trail_text', 'assets/img/over/hit_trail_text.png');
+    this.load.image('hit_enemy_text', 'assets/img/over/hit_enemy_text.png');
+    this.load.image('enemy_hit_trail_text', 'assets/img/over/enemy_hit_trail_text.png');
 
     //medalScene
     this.load.image('medal_bg', 'assets/img/medal/medal_bg.png'); 
