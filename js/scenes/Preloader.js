@@ -108,11 +108,11 @@ export default class Preloader extends Phaser.Scene {
     this.load.spritesheet('shield_effect', 'assets/img/play/shield_effect.png', { frameWidth: 200, frameHeight: 200 });
 
     // gameOverScene
-    // this.load.image('game_over_bee', 'assets/img/over/over_bee.png');
-    this.load.spritesheet('over_bee_1', 'assets/img/over/over_bee_1.png', { frameWidth: 456, frameHeight: 300 });
-    this.load.spritesheet('over_bee_2', 'assets/img/over/over_bee_2.png', { frameWidth: 456, frameHeight: 300 });
-    this.load.spritesheet('over_bee_3', 'assets/img/over/over_bee_3.png', { frameWidth: 456, frameHeight: 300 });
-    this.load.spritesheet('over_bee_4', 'assets/img/over/over_bee_4.png', { frameWidth: 456, frameHeight: 300 });
+    this.load.spritesheet('bee_over_1', 'assets/img/over/bee_over_1.png', { frameWidth: 456, frameHeight: 300 });
+    this.load.spritesheet('bee_over_2', 'assets/img/over/bee_over_2.png', { frameWidth: 456, frameHeight: 300 });
+    this.load.spritesheet('bee_over_3', 'assets/img/over/bee_over_3.png', { frameWidth: 456, frameHeight: 300 });
+    this.load.spritesheet('bee_over_4', 'assets/img/over/bee_over_4.png', { frameWidth: 456, frameHeight: 300 });
+    this.load.spritesheet('bee_over_5', 'assets/img/over/bee_over_5.png', { frameWidth: 456, frameHeight: 300 });
 
     this.load.image('game_over_balloon', 'assets/img/over/over_ballon.png');
     this.load.image('game_over_text_box', 'assets/img/over/over_text_box.png');

@@ -50,25 +50,26 @@ export default class GameOverScene extends Phaser.Scene {
    * UI요소 생성
    */
   createUI() {
-    const bee = this.add.sprite(this.centerX, this.centerY - 130, 'over_bee_1');
+    const bee = this.add.sprite(this.centerX, this.centerY - 130, 'bee_over_1');
 
     if (!this.anims.exists('bee_fly')) {
       this.anims.create({
         key: 'bee_fly',
         frames: [
-          { key: 'over_bee_1' },
-          { key: 'over_bee_2' },
-          { key: 'over_bee_3' },
-          { key: 'over_bee_4' }
+          ...this.anims.generateFrameNumbers('bee_over_1', { start: 0, end: 12 }),
+          ...this.anims.generateFrameNumbers('bee_over_2', { start: 0, end: 12 }),
+          ...this.anims.generateFrameNumbers('bee_over_3', { start: 0, end: 12 }),
+          ...this.anims.generateFrameNumbers('bee_over_4', { start: 0, end: 12 }),
+          ...this.anims.generateFrameNumbers('bee_over_5', { start: 0, end: 12 }),
         ],
-        frameRate: 3,
+        frameRate: 12,
         repeat: -1
       });
     }
 
     bee.play('bee_fly');
 
-    this.add.image(915, 167, 'game_over_balloon');
+    this.add.image(900, 167, 'game_over_balloon');
     this.add.image(this.centerX, this.centerY + 100, 'game_over_text_box');
   }
 
@@ -114,6 +115,6 @@ export default class GameOverScene extends Phaser.Scene {
   createBalloonText() {
     const randomIndex = Math.floor(Math.random() * balloonText.length);
     const balloonMessage = balloonText[randomIndex];
-    this.add.text(916, 154, balloonMessage, { fontSize: '32px', fontFamily: FONT_KKATURI, color: '#000000', align: 'center' }).setOrigin(0.5, 0.5);
+    this.add.text(900, 154, balloonMessage, { fontSize: '32px', fontFamily: FONT_KKATURI, color: '#000000', align: 'center' }).setOrigin(0.5, 0.5);
   }
 }
